@@ -8,10 +8,12 @@
 ##############################
 # dir.create('~/Fst_sliding_window/Galtabol_fst/')
 
-library(devtools)
+# library(devtools)
 library(windowscanr)
 library(patchwork)
 library(tidyverse)
+
+setwd('~/Fst_sliding_window')
 
 setwd('~/Fst_sliding_window/Galtabol_fst/')
 setwd('~/Fst_sliding_window/TLGBPL/')
@@ -32,6 +34,10 @@ data = read_tsv('TSBPL_fst.fst')
 data = read_tsv('VBRSIL_fst.fst')
 data = read_tsv('SLGBPL_fst.fst')
 data = read_tsv('SLGBPI_fst.fst')
+data = read_tsv('SLGBPEL_fst.fst')
+
+gal_avg_fst = data %>% summarise(avg_fst = mean(FST))
+v_avg_fst = data %>% summarise(avg_fst = mean(FST))
 
 # Sliding window analysis -------------------------------------------------
 
@@ -55,16 +61,16 @@ fst_position = winScan(x = data,
 ## large window size == less chance to find differences
 
 write_tsv(fst_position, 
-          'SLGBPI_Fst_200Kb_window.txt')
+          'SLGBPEL_Fst_200Kb_window.txt')
 
 # Plot data ---------------------------------------------------------------
 
 setwd('~/Fst_sliding_window/Galtabol_fst/')
+# setwd('~/Fst_sliding_window/SLGBPL/')
+setwd('~/Fst_sliding_window/')
 setwd('~/Fst_sliding_window/TLGBPL/') 
 setwd('~/Fst_sliding_window/TSBPL/')
 setwd('~/Fst_sliding_window/VBRSIL/')
-setwd('~/Fst_sliding_window/SLGBPL/')
-setwd('~/Fst_sliding_window/SLGBPI/')
 
 data = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>% 
   mutate(AC_CHR = as.factor(case_when(
@@ -138,6 +144,345 @@ Mb_Conversion = function(data){
 data = Mb_Conversion(data)
 
 #
+
+#
+# Fst outliers ------------------------------------------------------------
+
+## set the theme for all of the plots
+theme_set(theme_bw())
+
+data = data %>% 
+  filter(FST_n > 3) %>% 
+  na.omit() %>% 
+  ungroup()
+
+top5 = data[data$FST_mean > quantile(data$FST_mean, 
+                              prob = 1-5/100),]
+
+## need to combine the overlap and fst results for each popn
+top5_overlap = read_tsv('Fst_window_overlap_allBPpairs.txt')
+
+overlap_regions = data %>% 
+  filter(AC_CHR %in% c('AC24', 'AC25'))
+
+overlap = inner_join(overlap_regions, 
+           top5_overlap, 
+           by = 'win_mid') %>% 
+  select(-AC_CHR.y) %>% 
+  rename(AC_CHR = AC_CHR.x) %>% 
+  group_by(AC_CHR) 
+
+overlap
+write_tsv(overlap, 
+          'VBRSIL_Fst_overlaping_regions.txt')
+#
+# Avg fst outlier per chromosome ------------------------------------------
+##filter the data
+data = data %>% 
+  filter(FST_n > 3) %>% 
+  na.omit() %>% 
+  ungroup()
+
+
+# Fst bar graph neutral ---------------------------------------------------
+data = data %>% 
+  filter(FST_n > 3) %>% 
+  na.omit() %>% 
+  ungroup()
+
+T_top5 = data[data$FST_mean > quantile(data$FST_mean, 
+                                       prob = 1-5/100),]
+
+write_tsv(T_top5, 
+          'VBRSIL_Fst_outliers_200Kb_window.txt')
+T_neutral = anti_join(data, 
+                       T_top5, 
+          by = c('win_start', 
+                 'win_end', 
+                 'win_mid', 
+                 'FST_n',
+                 'FST_mean', 
+                 'FST_sd', 
+                 'AC_CHR', 
+                 'win_mid_mb'))
+write_tsv(T_neutral, 
+          'VBRSIL_Fst_neutral_200Kb_window.txt')
+
+G_neutral_mean = G_neutral %>% 
+  group_by(AC_CHR) %>% 
+  summarise(avg_neutral_fst = mean(FST_mean))
+
+label = rep('V: Benthic - pelagic', 
+            length(V_neutral_mean$avg_neutral_fst)) %>% 
+  as_tibble()
+## Bind that back together
+V_neutral_data = bind_cols(V_neutral_mean, 
+                   label) %>% 
+  rename(Morph_compare = value)
+
+
+G_neutral_data
+S_neutral_data
+T1_neutral_data
+T2_neutral_data
+V_neutral_data
+
+neutral_data = bind_rows(G_neutral_data, 
+                         S_neutral_data, 
+                         T1_neutral_data, 
+                         T2_neutral_data, 
+                         V_neutral_data)
+new_colors = c('#88A825',
+               '#35203B',
+               '#911146',
+               '#CF4A30',
+               '#ED8C2B')
+
+Avg_fst_neutral = neutral_data %>% 
+  ggplot()+
+  geom_bar(aes(x = AC_CHR, 
+               y = avg_neutral_fst, 
+               # col = Morph_compare, 
+               fill = Morph_compare),
+           stat = 'identity', 
+           position = 'dodge')+
+  # scale_color_manual(values = new_colors)+
+  scale_fill_manual(values = new_colors) +
+  labs(title = 'A)', 
+       x = 'Chromosome', 
+       y = 'Average Fst')+
+  guides(fill = guide_legend(title = 'Morph Pair'))+
+  theme(axis.title = element_text(size = 12), 
+        axis.text.y = element_text(size = 12), 
+        axis.text.x = element_text(size = 9,
+                                   angle = 90,
+                                   hjust = 1), 
+        axis.ticks = element_line(size = 2), 
+        panel.grid = element_blank())
+
+
+# Fst bar graph - outliers ------------------------------------------------
+
+## find top 5% Fst outliers
+G_top5 = data[data$FST_mean > quantile(data$FST_mean, 
+                                     prob = 1-5/100),]
+
+write_tsv(G_top5, 
+          'GSBPI_Fst_outliers_200Kb_window.txt')
+## summarise avg fst per chromosome
+V_mean = V_top5 %>% 
+  group_by(AC_CHR) %>% 
+  summarise(avg_fst = mean(FST_mean))
+## need a population label for the data frame
+label = rep('V: Benthic - pelagic', 
+    length(V_mean$avg_fst)) %>% 
+  as_tibble()
+## Bind that back together
+V_data = bind_cols(V_mean, 
+                   label) %>% 
+  rename(Morph_compare = value)
+
+
+G_data
+S_data 
+T1_data
+T2_data
+V_data
+
+outlier_data = bind_rows(G_data, 
+                         S_data, 
+                         T1_data, 
+                         T2_data, 
+                         V_data)
+
+# colors = c('#467BB3',
+#                '#FF1E0C',
+#                '#108565',
+#                '#D1BA0A')
+
+new_colors = c('#88A825',
+               '#35203B',
+               '#911146',
+               '#CF4A30',
+               '#ED8C2B')
+
+Avg_fst_outliers = outlier_data %>% 
+  ggplot()+
+  geom_bar(aes(x = AC_CHR, 
+           y = avg_fst, 
+           # col = Morph_compare, 
+           fill = Morph_compare),
+           stat = 'identity', 
+           position = 'dodge')+
+  # scale_color_manual(values = new_colors)+
+  scale_fill_manual(values = new_colors) +
+  labs(title = 'B)', 
+       x = 'Chromosome', 
+       y = 'Average Fst')+
+  guides(fill = guide_legend(title = 'Morph Pair'))+
+  theme(axis.title = element_text(size = 12), 
+        axis.text.y = element_text(size = 12), 
+        axis.text.x = element_text(size = 9,
+                                   angle = 90,
+                                   hjust = 1), 
+        axis.ticks = element_line(size = 2), 
+        panel.grid = element_blank(), 
+        legend.position = 'none')
+
+
+
+
+Avg_fst_neutral/Avg_fst_outliers
+
+ggsave('Fst_window_neutral_outliers_combined.tiff', 
+       plot = last_plot())
+
+#
+# histogram of outliers ---------------------------------------------------
+
+
+## histogram of mean Fst values per window
+G_hist = ggplot(data = data)+
+  geom_histogram(aes(x = FST_mean),
+                 col = '#3E423A',
+                 fill = '#3E423A')+
+  geom_histogram(data = top5, 
+                 aes(x = FST_mean),
+                 col = '#02808E', 
+                 fill = '#02808E') +
+  labs(title = 'A)', 
+       x = 'Mean Fst', 
+       y = 'Number of windows')+
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 12,
+                                  face = 'bold'),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        axis.title.y = element_text(size = 12),
+        axis.ticks = element_line(size = 2),
+        # axis.title.x = element_blank()
+        )
+
+V_hist 
+
+#
+# Fst Outlier plot --------------------------------------------------------
+
+## plot of Fst including outliers per chromosome
+V_fst = ggplot(data = data,
+         aes(x = win_mid_mb,
+             y = FST_mean, 
+             group = AC_CHR)) +
+  geom_point(col = '#3E423A')+
+    # geom_smooth(col = '#1F2440',
+    #             size = 2)+
+  geom_point(data = top5, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean, 
+                 group = AC_CHR), 
+             col = '#02808E')+
+  geom_point(data = overlap, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean, 
+                 group = AC_CHR), 
+             col = '#D9042B')+
+  facet_grid(~ AC_CHR, 
+             scales = 'free')+
+  labs(title = 'E)', 
+       x = 'Chromosomal position (Mb)', 
+       y = 'Fst')+
+  ylim(0.00, 1.00)+
+  theme(panel.grid = element_blank(), 
+        # axis.text.x = element_blank(),
+        axis.text.x = element_text(size = 9,
+                                   angle = 90,
+                                   hjust = 1),
+        # axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.text = element_text(face = 'bold',
+                                  size = 10),
+        strip.background = element_rect(fill = 'white',
+                                        colour = 'black'), 
+        plot.title = element_text(size = 12,
+                                  face = 'bold'))
+
+G_fst
+
+
+# Combine plots -----------------------------------------------------------
+
+library(patchwork)
+
+G_hist/S_hist/T1_hist/T2_hist/V_hist
+
+ggsave('FigS3_Fst_outlier_histograms.tiff',
+       plot = last_plot(), 
+       height = 9)
+
+
+G_fst/S_fst/T1_fst/T2_fst/V_fst
+
+ggsave('Fig3_Fst_200kb_window_overlap.tiff',
+       plot = last_plot(), 
+       width = 25,
+       height = 9,
+       limitsize = FALSE)
+
+
+# Fst window outlier overlap ----------------------------------------------
+data = data %>% 
+  filter(FST_n > 3) %>% 
+  na.omit() %>% 
+  ungroup()
+
+V_top5 = data[data$FST_mean > quantile(data$FST_mean, 
+                                     prob = 1-5/100),]
+
+# View(G_top5)
+
+## need to figure out the number of distinct outliers 
+## THis is due to the high overlap between windows
+V_distinct_outliers = V_top5 %>% 
+  group_by(AC_CHR) %>% 
+  distinct(FST_mean)
+
+G_distinct_outliers
+S_distinct_outliers
+T1_distinct_outliers
+T2_distinct_outliers
+V_distinct_outliers
+
+## sort through the top 5% Fst outliers for each population
+G_top5 = G_top5 %>% 
+  group_by(AC_CHR) 
+S_top5 = S_top5 %>% 
+  group_by(AC_CHR) 
+T1_top5 = T1_top5 %>% 
+  group_by(AC_CHR) 
+T2_top5 = T2_top5 %>% 
+  group_by(AC_CHR) 
+V_top5 = V_top5 %>% 
+  group_by(AC_CHR) 
+
+tests = dplyr::intersect(G_top5,
+          S_top5,
+          by = 'win_mid')
+          
+tests = intersect(tests, 
+                  T1_top5, 
+                  by = 'win_mid')
+
+tests = intersect(tests, 
+                  T2_top5, 
+                  by = 'win_mid')
+
+tests = intersect(tests, 
+                  V_top5,
+                  by = 'win_mid')
+
+write_tsv(tests, 
+          'Fst_window_overlap_allBPpairs.txt')
+#
 # SNP density plot -------------------------------------------------------------
 
 SNP_density_plot = data %>% 
@@ -203,7 +548,7 @@ plot_fst = data %>%
                 size = 2)+
   facet_grid(~ AC_CHR, 
              scales = 'free')+
-  labs(title = 'VBRSIL Fst 200kb window', 
+  labs(title = 'SLGBPEL Fst 200kb window', 
        x = 'Chromosomal position (Mb)', 
        y = 'Fst')+
   ylim(0.00, 1.00)+
@@ -223,8 +568,10 @@ plot_fst = data %>%
 plot_fst
 # final = plot_10kb/plot_50kb/plot_100kb/plot_150kb/plot_200kb/plot_250kb
 
-ggsave('VBRSIL_Fst_200kb_window.tiff',
+ggsave('SLGBPEL_Fst_200kb_window.tiff',
        plot = plot_fst, 
        width = 25,
        height = 10,
        limitsize = FALSE)
+
+
