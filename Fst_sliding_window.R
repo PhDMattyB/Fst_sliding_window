@@ -13,14 +13,14 @@ library(windowscanr)
 library(patchwork)
 library(tidyverse)
 
-setwd('~/Fst_sliding_window')
-
-setwd('~/Fst_sliding_window/Galtabol_fst/')
-setwd('~/Fst_sliding_window/TLGBPL/')
-setwd('~/Fst_sliding_window/TSBPL/')
-setwd('~/Fst_sliding_window/VBRSIL/')
-setwd('~/Fst_sliding_window/SLGBPL/')
-setwd('~/Fst_sliding_window/SLGBPI/')
+# setwd('~/Fst_sliding_window')
+setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
+# setwd('~/Fst_sliding_window/Galtabol_fst/')
+# setwd('~/Fst_sliding_window/TLGBPL/')
+# setwd('~/Fst_sliding_window/TSBPL/')
+# setwd('~/Fst_sliding_window/VBRSIL/')
+# setwd('~/Fst_sliding_window/SLGBPL/')
+# setwd('~/Fst_sliding_window/SLGBPI/')
 
 # data --------------------------------------------------------------------
 ## This is the data needed for the sliding window analysis. 
@@ -28,12 +28,12 @@ setwd('~/Fst_sliding_window/SLGBPI/')
 ## Need to make sure we specify the --chr-set to 39
 ## and make sure the contigs or unplaced regions are 
 ## set to 0
-data = read_tsv('Galtabol_chr_fix.fst')
+data = read_tsv('Galtabol_fst_NA.fst')
 data = read_tsv('TLGBPL_fst.fst')
 data = read_tsv('TSBPL_fst.fst')
 data = read_tsv('VBRSIL_fst.fst')
-data = read_tsv('SLGBPL_fst.fst')
-data = read_tsv('SLGBPI_fst.fst')
+# data = read_tsv('SLGBPL_fst.fst')
+# data = read_tsv('SLGBPI_fst.fst')
 data = read_tsv('SLGBPEL_fst.fst')
 
 gal_avg_fst = data %>% summarise(avg_fst = mean(FST))
@@ -50,9 +50,10 @@ fst_position = winScan(x = data,
                        position = 'POS',
                        values = 'FST', 
                        win_size = 200000, 
-                       win_step = 1000, 
+                       win_step = 199000, 
                        funs = c('mean', 'sd'))
-
+fst_position = fst_position %>%
+  as_tibble()
 # write avg fst per window ------------------------------------------------
 ## Write the txt file for each window size. 
 ## Need to compare the different window sizes to see which one
@@ -61,18 +62,20 @@ fst_position = winScan(x = data,
 ## large window size == less chance to find differences
 
 write_tsv(fst_position, 
-          'SLGBPEL_Fst_200Kb_window.txt')
+          'VBRSIL_Fst_200Kb_window.txt')
 
 # Plot data ---------------------------------------------------------------
 
-setwd('~/Fst_sliding_window/Galtabol_fst/')
+# setwd('~/Fst_sliding_window/Galtabol_fst/')
 # setwd('~/Fst_sliding_window/SLGBPL/')
-setwd('~/Fst_sliding_window/')
-setwd('~/Fst_sliding_window/TLGBPL/') 
-setwd('~/Fst_sliding_window/TSBPL/')
-setwd('~/Fst_sliding_window/VBRSIL/')
+# setwd('~/Fst_sliding_window/')
+# setwd('~/Fst_sliding_window/TLGBPL/') 
+# setwd('~/Fst_sliding_window/TSBPL/')
+# setwd('~/Fst_sliding_window/VBRSIL/')
 
-data = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>% 
+setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
+
+data = read_tsv('GSBPI_Fst_200Kb_window.txt') %>% 
   mutate(AC_CHR = as.factor(case_when(
            CHR == '1' ~ 'AC01',
            CHR == '2' ~ 'AC02',
