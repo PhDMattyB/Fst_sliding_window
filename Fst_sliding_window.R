@@ -73,7 +73,7 @@ write_tsv(fst_position,
 # setwd('~/Fst_sliding_window/TSBPL/')
 # setwd('~/Fst_sliding_window/VBRSIL/')
 
-setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
+# setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 
 data = read_tsv('GSBPI_Fst_200Kb_window.txt') %>% 
   mutate(AC_CHR = as.factor(case_when(
@@ -433,10 +433,18 @@ ggsave('Fig3_Fst_200kb_window_overlap.tiff',
 
 
 # Fst window outlier overlap ----------------------------------------------
-data = data %>% 
+
+filter_data = data %>% 
   filter(FST_n > 3) %>% 
   na.omit() %>% 
   ungroup()
+
+filter_data %>%
+  group_by(AC_CHR) %>% 
+  summarise(n = n()) %>% 
+  View()
+
+
 
 V_top5 = data[data$FST_mean > quantile(data$FST_mean, 
                                      prob = 1-5/100),]
