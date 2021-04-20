@@ -186,7 +186,7 @@ data = data %>%
   na.omit() %>% 
   ungroup()
 
-
+##
 # Fst bar graph neutral ---------------------------------------------------
 data = data %>% 
   filter(FST_n > 3) %>% 
@@ -439,21 +439,25 @@ filter_data = data %>%
   na.omit() %>% 
   ungroup()
 
-filter_data %>%
-  group_by(AC_CHR) %>% 
-  summarise(n = n()) %>% 
-  View()
+# filter_data %>%
+#   group_by(AC_CHR) %>% 
+#   summarise(n = n()) %>% 
+#   View()
 
 
 
-V_top5 = data[data$FST_mean > quantile(data$FST_mean, 
+S_top5 = data[data$FST_mean > quantile(data$FST_mean, 
                                      prob = 1-5/100),]
+
+
+G_top5 = filter_data[filter_data$FST_mean > quantile(filter_data$FST_mean, 
+                                       prob = 1-5/100),]
 
 # View(G_top5)
 
 ## need to figure out the number of distinct outliers 
 ## THis is due to the high overlap between windows
-V_distinct_outliers = V_top5 %>% 
+G_distinct_outliers = G_top5 %>% 
   group_by(AC_CHR) %>% 
   distinct(FST_mean)
 
@@ -462,6 +466,9 @@ S_distinct_outliers
 T1_distinct_outliers
 T2_distinct_outliers
 V_distinct_outliers
+
+write_csv(V_distinct_outliers, 
+          'VBRSIL_Fst_outliers_19.04.2021.csv')
 
 ## sort through the top 5% Fst outliers for each population
 G_top5 = G_top5 %>% 
@@ -475,24 +482,56 @@ T2_top5 = T2_top5 %>%
 V_top5 = V_top5 %>% 
   group_by(AC_CHR) 
 
-tests = dplyr::intersect(G_top5,
+GS_intersect = dplyr::intersect(G_top5,
           S_top5,
           by = 'win_mid')
-          
-tests = intersect(tests, 
-                  T1_top5, 
-                  by = 'win_mid')
 
-tests = intersect(tests, 
-                  T2_top5, 
-                  by = 'win_mid')
+GT1_intersect = dplyr::intersect(G_top5,
+                                T1_top5,
+                                by = 'win_mid')
 
-tests = intersect(tests, 
-                  V_top5,
-                  by = 'win_mid')
+GT2_intersect = dplyr::intersect(G_top5,
+                                 T2_top5,
+                                 by = 'win_mid')
 
-write_tsv(tests, 
-          'Fst_window_overlap_allBPpairs.txt')
+GV_intersect = dplyr::intersect(G_top5,
+                                 V_top5,
+                                 by = 'win_mid')
+ST1_intersect = dplyr::intersect(S_top5,
+                                 T1_top5,
+                                 by = 'win_mid')
+
+ST2_intersect = dplyr::intersect(S_top5,
+                                 T2_top5,
+                                 by = 'win_mid')
+SV_intersect = dplyr::intersect(S_top5,
+                                 V_top5,
+                                 by = 'win_mid')
+T1T2_intersect = dplyr::intersect(T1_top5,
+                                T2_top5,
+                                by = 'win_mid')
+T1V_intersect = dplyr::intersect(T1_top5,
+                                V_top5,
+                                by = 'win_mid')
+T2V_intersect = dplyr::intersect(T2_top5,
+                                 V_top5,
+                                 by = 'win_mid')
+
+
+# tests = intersect(tests, 
+#                   T1_top5, 
+#                   by = 'win_mid')
+# 
+# tests = intersect(tests, 
+#                   T2_top5, 
+#                   by = 'win_mid')
+# 
+# tests = intersect(tests, 
+#                   V_top5,
+#                   by = 'win_mid')
+# 
+# write_tsv(tests, 
+#           'Fst_window_overlap_allBPpairs.txt')
 #
 # SNP density plot -------------------------------------------------------------
 
@@ -528,8 +567,8 @@ SNP_density_plot = data %>%
         plot.title = element_text(size = 18,
                                   face = 'bold'))
 
-setwd('~/Fst_sliding_window/')
-ggsave('SNP_density_per_window.tiff',
+# setwd('~/Fst_sliding_window/')
+ggsave('SNP_density_per_window_19.04.2021.tiff',
        plot = SNP_density_plot, 
        width = 30,
        height = 10,

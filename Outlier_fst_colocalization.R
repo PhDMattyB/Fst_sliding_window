@@ -21,10 +21,14 @@ setwd('~/Fst_sliding_window/SLGBPL/')
 setwd('~/Fst_sliding_window/SLGBPI/')
 setwd('~/Fst_sliding_window/')
 
-# Data manipulation -------------------------------------------------------
-data = read_tsv('TSBPL_fst.fst')
+setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 
-outliers = read_csv('TSBPL_Outlier_data.csv') %>% 
+# Data manipulation -------------------------------------------------------
+data = read_tsv('GSBPI_fst.fst')
+
+data = read_tsv('Galtabol_fst_NA.fst')
+
+outliers = read_csv('GSBPI_Outlier_data2.csv') %>% 
   rename(SNP = `Marker ID`) %>% 
   select(SNP, 
          `#Chromosome`,
@@ -97,7 +101,7 @@ not_outliers = bind_cols(not_outliers,
                          grouping)
 
 write_tsv(not_outliers,
-          'TSBPL_Neutral_snps.txt', col_names = TRUE)
+          'GSBPI_Neutral_snps.txt', col_names = TRUE)
 
 # outliers$value
 overlap_outliers = outliers %>% 
@@ -171,25 +175,25 @@ morpho_fst = bind_cols(morpho_fst,
 
 ## write the three files as csvs
 write_tsv(BothTraits_Fst, 
-          'TSBPL_BOTHoutliers_Fst.txt')
+          'GSBPI_BOTHoutliers_Fst.txt')
 
 write_tsv(Iso_fst, 
-          'TSBPL_ISOoutliers_Fst.txt')
+          'GSBPI_ISOoutliers_Fst.txt')
 
 write_tsv(morpho_fst, 
-          'TSBPL_MORPHOoutliers_Fst.txt')
+          'GSBPI_MORPHOoutliers_Fst.txt')
 
 ## read in the neutral data
-df_nonout = read_tsv('TSBPL_Neutral_snps.txt')
+df_nonout = read_tsv('GSBPI_Neutral_snps.txt')
 
 ##read in the outlier data
 # df_outliers = read_tsv('GSBPI_outliers_Fst.txt')
 
-overlap_outs = read_tsv('TSBPL_BOTHoutliers_Fst.txt') %>% 
+overlap_outs = read_tsv('GSBPI_BOTHoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-iso_outs = read_tsv('TSBPL_ISOoutliers_Fst.txt') %>% 
+iso_outs = read_tsv('GSBPI_ISOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-morpho_outs = read_tsv('TSBPL_MORPHOoutliers_Fst.txt') %>% 
+morpho_outs = read_tsv('GSBPI_MORPHOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
 
 range_cal = function(data){
@@ -218,7 +222,7 @@ morpho_outs = range_cal(morpho_outs)
 
 list_of_dfs = list()
 
-df_outliers = morpho_outs
+df_outliers = overlap_outs
 
 for(i in 1:nrow(df_outliers)){
   
@@ -272,13 +276,13 @@ outs = df_outliers %>%
 bind_rows(neutral_range_snps, 
                    outs) %>% 
   arrange(CHR, POS) %>% 
-  write_tsv('TSBPL_MORPHOOutliers_Colocalization_data.txt')
+  write_tsv('GSBPI_BOTHOutliers_Colocalization_data.txt')
 
 ##  
 # Sliding window ----------------------------------------------------------
-Both = read_tsv('TSBPL_BOTHOutliers_Colocalization_data.txt')
-iso = read_tsv('TSBPL_ISOOutliers_Colocalization_data.txt')
-morpho = read_tsv('TSBPL_MORPHOOutliers_Colocalization_data.txt')
+Both = read_tsv('GSBPI_BOTHOutliers_Colocalization_data.txt')
+iso = read_tsv('GSBPI_ISOOutliers_Colocalization_data.txt')
+morpho = read_tsv('GSBPI_MORPHOOutliers_Colocalization_data.txt')
 
 
 fst_window = winScan(x = morpho,
@@ -287,13 +291,13 @@ fst_window = winScan(x = morpho,
                      position = 'POS',
                      values = 'FST',
                      win_size = 200000,
-                     win_step = 1000,
+                     win_step = 199000,
                      funs = c('mean', 'sd'))
 
 fst_window %>%
   as_tibble() %>%
   filter(FST_n >3) %>%
-  write_csv('TSBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv',
+  write_csv('GSBPI_MORPHO_Colocalization_Fst_Outliers_200Kb.csv',
             col_names = T)
 
 read_csv('TSBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv') 
