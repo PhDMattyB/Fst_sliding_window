@@ -33,8 +33,9 @@ Mb_Conversion = function(data){
 
 setwd('~/PhD/SNP Demographic modelling/Outliers_directory/Fst_RDA_Colocalization')
 
+
 # Both_outlier = read_csv('TSBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>%
-Both_outlier = read_csv('TLGBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+Both_outlier = read_csv('GSBPI_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -78,7 +79,7 @@ Both_outlier = read_csv('TLGBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>%
     CHR == '39' ~ 'AC37',
     CHR == '0' ~ 'Contigs')))
 
-iso_outlier = read_csv('TLGBPL_ISO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+iso_outlier = read_csv('GSBPI_ISO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>%
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -122,7 +123,7 @@ iso_outlier = read_csv('TLGBPL_ISO_Colocalization_Fst_Outliers_200Kb.csv') %>%
     CHR == '39' ~ 'AC37',
     CHR == '0' ~ 'Contigs')))
 
-morpho_outlier = read_csv('TLGBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+morpho_outlier = read_csv('GSBPI_MORPHO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>%
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -166,7 +167,7 @@ morpho_outlier = read_csv('TLGBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv')
     CHR == '39' ~ 'AC37',
     CHR == '0' ~ 'Contigs')))
 
-normal = read_tsv('TLGBPL_Fst_neutral_200Kb_window.txt') %>%
+normal = read_csv('GSBPI_Fst_Neutral_200Kb_windows.19.04.2021.csv') %>%
   filter(FST_n > 3) %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -211,7 +212,7 @@ normal = read_tsv('TLGBPL_Fst_neutral_200Kb_window.txt') %>%
     CHR == '0' ~ 'Contigs')))
 
 # fst_outlier = read_tsv('SLGPEL_Fst_outliers_200Kb_window.txt') %>%
-  fst_outlier = read_tsv('TLGBPL_Fst_outliers_200Kb_window.txt') %>% 
+  fst_outlier = read_csv('GSBPI_Fst_200kb_outliers_19.04.2021.csv') %>% 
 filter(FST_n > 3) %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -485,7 +486,7 @@ theme_set(theme_bw())
 overlap = read_tsv('TLGBPL_Fst_overlaping_regions.txt')
 ## Drop windows with less than 3 SNPs
 
-TLGBPL_plot_fst2 =
+GSBPI_plot_fst2 =
   ggplot(data = normal, 
                   aes(x = win_mid_mb,
              y = FST_mean, 
@@ -516,17 +517,17 @@ TLGBPL_plot_fst2 =
                  group = AC_CHR),
              col = '#F2CD13', 
              size = 2)+
-  geom_point(data = overlap, 
-             aes(x = win_mid_mb, 
-                 y = FST_mean, 
-                 group =AC_CHR), 
-             col = '#3D1673',
-             size = 2)+
+  # geom_point(data = overlap, 
+  #            aes(x = win_mid_mb, 
+  #                y = FST_mean, 
+  #                group =AC_CHR), 
+  #            col = '#3D1673',
+  #            size = 2)+
     facet_grid(~ AC_CHR, 
              scales = 'free')+
   labs(x = 'Chromosomal position (Mb)', 
        y = 'Fst',
-       title = 'Thingvallavatn LGB-PL')+
+       title = 'Galtabol')+
   # ylim(0.00, 1.00)+
   theme(panel.grid = element_blank(), 
         axis.text.x = element_blank(),

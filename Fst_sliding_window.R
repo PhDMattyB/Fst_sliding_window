@@ -39,6 +39,9 @@ data = read_tsv('SLGBPEL_fst.fst')
 gal_avg_fst = data %>% summarise(avg_fst = mean(FST))
 v_avg_fst = data %>% summarise(avg_fst = mean(FST))
 
+
+data %>% 
+  group_by(CHR)
 # Sliding window analysis -------------------------------------------------
 
 ## This is performed on the lab computer
@@ -439,6 +442,8 @@ filter_data = data %>%
   na.omit() %>% 
   ungroup()
 
+write_csv(filter_data, 
+          'GSBPI_Fst_Neutral_200Kb_windows.19.04.2021.csv')
 # filter_data %>%
 #   group_by(AC_CHR) %>% 
 #   summarise(n = n()) %>% 
@@ -453,6 +458,7 @@ S_top5 = data[data$FST_mean > quantile(data$FST_mean,
 G_top5 = filter_data[filter_data$FST_mean > quantile(filter_data$FST_mean, 
                                        prob = 1-5/100),]
 
+write_csv(G_top5, 'GSBPI_Fst_200kb_outliers_19.04.2021.csv')
 # View(G_top5)
 
 ## need to figure out the number of distinct outliers 
