@@ -13,14 +13,14 @@ library(windowscanr)
 library(patchwork)
 library(tidyverse)
 
-setwd('~/Fst_sliding_window')
-
-setwd('~/Fst_sliding_window/Galtabol_fst/')
-setwd('~/Fst_sliding_window/TLGBPL/')
-setwd('~/Fst_sliding_window/TSBPL/')
-setwd('~/Fst_sliding_window/VBRSIL/')
-setwd('~/Fst_sliding_window/SLGBPL/')
-setwd('~/Fst_sliding_window/SLGBPI/')
+# setwd('~/Fst_sliding_window')
+setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
+# setwd('~/Fst_sliding_window/Galtabol_fst/')
+# setwd('~/Fst_sliding_window/TLGBPL/')
+# setwd('~/Fst_sliding_window/TSBPL/')
+# setwd('~/Fst_sliding_window/VBRSIL/')
+# setwd('~/Fst_sliding_window/SLGBPL/')
+# setwd('~/Fst_sliding_window/SLGBPI/')
 
 # data --------------------------------------------------------------------
 ## This is the data needed for the sliding window analysis. 
@@ -28,12 +28,12 @@ setwd('~/Fst_sliding_window/SLGBPI/')
 ## Need to make sure we specify the --chr-set to 39
 ## and make sure the contigs or unplaced regions are 
 ## set to 0
-data = read_tsv('Galtabol_chr_fix.fst')
+data = read_tsv('Galtabol_fst_NA.fst')
 data = read_tsv('TLGBPL_fst.fst')
 data = read_tsv('TSBPL_fst.fst')
 data = read_tsv('VBRSIL_fst.fst')
-data = read_tsv('SLGBPL_fst.fst')
-data = read_tsv('SLGBPI_fst.fst')
+# data = read_tsv('SLGBPL_fst.fst')
+# data = read_tsv('SLGBPI_fst.fst')
 data = read_tsv('SLGBPEL_fst.fst')
 
 gal_avg_fst = data %>% summarise(avg_fst = mean(FST))
@@ -50,9 +50,10 @@ fst_position = winScan(x = data,
                        position = 'POS',
                        values = 'FST', 
                        win_size = 200000, 
-                       win_step = 1000, 
+                       win_step = 199000, 
                        funs = c('mean', 'sd'))
-
+fst_position = fst_position %>%
+  as_tibble()
 # write avg fst per window ------------------------------------------------
 ## Write the txt file for each window size. 
 ## Need to compare the different window sizes to see which one
@@ -61,18 +62,20 @@ fst_position = winScan(x = data,
 ## large window size == less chance to find differences
 
 write_tsv(fst_position, 
-          'SLGBPEL_Fst_200Kb_window.txt')
+          'VBRSIL_Fst_200Kb_window.txt')
 
 # Plot data ---------------------------------------------------------------
 
-setwd('~/Fst_sliding_window/Galtabol_fst/')
+# setwd('~/Fst_sliding_window/Galtabol_fst/')
 # setwd('~/Fst_sliding_window/SLGBPL/')
-setwd('~/Fst_sliding_window/')
-setwd('~/Fst_sliding_window/TLGBPL/') 
-setwd('~/Fst_sliding_window/TSBPL/')
-setwd('~/Fst_sliding_window/VBRSIL/')
+# setwd('~/Fst_sliding_window/')
+# setwd('~/Fst_sliding_window/TLGBPL/') 
+# setwd('~/Fst_sliding_window/TSBPL/')
+# setwd('~/Fst_sliding_window/VBRSIL/')
 
-data = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>% 
+# setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
+
+data = read_tsv('GSBPI_Fst_200Kb_window.txt') %>% 
   mutate(AC_CHR = as.factor(case_when(
            CHR == '1' ~ 'AC01',
            CHR == '2' ~ 'AC02',
@@ -183,7 +186,7 @@ data = data %>%
   na.omit() %>% 
   ungroup()
 
-
+##
 # Fst bar graph neutral ---------------------------------------------------
 data = data %>% 
   filter(FST_n > 3) %>% 
@@ -430,19 +433,31 @@ ggsave('Fig3_Fst_200kb_window_overlap.tiff',
 
 
 # Fst window outlier overlap ----------------------------------------------
-data = data %>% 
+
+filter_data = data %>% 
   filter(FST_n > 3) %>% 
   na.omit() %>% 
   ungroup()
 
-V_top5 = data[data$FST_mean > quantile(data$FST_mean, 
+# filter_data %>%
+#   group_by(AC_CHR) %>% 
+#   summarise(n = n()) %>% 
+#   View()
+
+
+
+S_top5 = data[data$FST_mean > quantile(data$FST_mean, 
                                      prob = 1-5/100),]
+
+
+G_top5 = filter_data[filter_data$FST_mean > quantile(filter_data$FST_mean, 
+                                       prob = 1-5/100),]
 
 # View(G_top5)
 
 ## need to figure out the number of distinct outliers 
 ## THis is due to the high overlap between windows
-V_distinct_outliers = V_top5 %>% 
+G_distinct_outliers = G_top5 %>% 
   group_by(AC_CHR) %>% 
   distinct(FST_mean)
 
@@ -451,6 +466,9 @@ S_distinct_outliers
 T1_distinct_outliers
 T2_distinct_outliers
 V_distinct_outliers
+
+write_csv(V_distinct_outliers, 
+          'VBRSIL_Fst_outliers_19.04.2021.csv')
 
 ## sort through the top 5% Fst outliers for each population
 G_top5 = G_top5 %>% 
@@ -464,24 +482,56 @@ T2_top5 = T2_top5 %>%
 V_top5 = V_top5 %>% 
   group_by(AC_CHR) 
 
-tests = dplyr::intersect(G_top5,
+GS_intersect = dplyr::intersect(G_top5,
           S_top5,
           by = 'win_mid')
-          
-tests = intersect(tests, 
-                  T1_top5, 
-                  by = 'win_mid')
 
-tests = intersect(tests, 
-                  T2_top5, 
-                  by = 'win_mid')
+GT1_intersect = dplyr::intersect(G_top5,
+                                T1_top5,
+                                by = 'win_mid')
 
-tests = intersect(tests, 
-                  V_top5,
-                  by = 'win_mid')
+GT2_intersect = dplyr::intersect(G_top5,
+                                 T2_top5,
+                                 by = 'win_mid')
 
-write_tsv(tests, 
-          'Fst_window_overlap_allBPpairs.txt')
+GV_intersect = dplyr::intersect(G_top5,
+                                 V_top5,
+                                 by = 'win_mid')
+ST1_intersect = dplyr::intersect(S_top5,
+                                 T1_top5,
+                                 by = 'win_mid')
+
+ST2_intersect = dplyr::intersect(S_top5,
+                                 T2_top5,
+                                 by = 'win_mid')
+SV_intersect = dplyr::intersect(S_top5,
+                                 V_top5,
+                                 by = 'win_mid')
+T1T2_intersect = dplyr::intersect(T1_top5,
+                                T2_top5,
+                                by = 'win_mid')
+T1V_intersect = dplyr::intersect(T1_top5,
+                                V_top5,
+                                by = 'win_mid')
+T2V_intersect = dplyr::intersect(T2_top5,
+                                 V_top5,
+                                 by = 'win_mid')
+
+
+# tests = intersect(tests, 
+#                   T1_top5, 
+#                   by = 'win_mid')
+# 
+# tests = intersect(tests, 
+#                   T2_top5, 
+#                   by = 'win_mid')
+# 
+# tests = intersect(tests, 
+#                   V_top5,
+#                   by = 'win_mid')
+# 
+# write_tsv(tests, 
+#           'Fst_window_overlap_allBPpairs.txt')
 #
 # SNP density plot -------------------------------------------------------------
 
@@ -517,8 +567,8 @@ SNP_density_plot = data %>%
         plot.title = element_text(size = 18,
                                   face = 'bold'))
 
-setwd('~/Fst_sliding_window/')
-ggsave('SNP_density_per_window.tiff',
+# setwd('~/Fst_sliding_window/')
+ggsave('SNP_density_per_window_19.04.2021.tiff',
        plot = SNP_density_plot, 
        width = 30,
        height = 10,
