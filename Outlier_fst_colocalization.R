@@ -346,14 +346,15 @@ fst_window %>%
 # read_csv('GSBPI_Fst_Outliers_Combined_200Kb.csv')
 # read_csv('GSBPI_Fst_Outliers_Combined_200Kb.csv')
 
-GSBPI = read_csv('GSBPI_Colocalization_Fst_Outliers_200Kb.csv') 
+GSBPI = read_csv('GSBPI_Fst_200kb_outliers_19.04.2021.csv') 
   # filter(value == 'Outlier', 
   #        FST_n > 0) %>%
   # filter(row_number() %% 101 == 1) %>% 
   # filter(row_number() %% 2 == 1)
 
-SLGBPL = read_csv('SLGBPL_Colocalization_Fst_Outliers_200Kb.csv') %>% 
-  filter(value == 'Outlier', 
+# SLGBPL = read_csv('SLGBPL_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+SLGBPEL  
+filter(value == 'Outlier', 
          FST_n > 0) %>%
   filter(row_number() %% 101 == 1) %>% 
   filter(row_number() %% 2 == 1)
@@ -500,7 +501,7 @@ plot_fst
 ggsave(plot = last_plot(), 
        'VBRSIL_Outlier_Fst_peaks_colocalization.tiff')
 # Colocalization table and bar chart ------------------------------------------------
-setwd('~/Fst_sliding_window')
+# setwd('~/Fst_sliding_window')
 
 GSBPI_out = read_tsv('GSBPI_Colocalization_data.txt')
 value = rep('GSBPI', length(GSBPI_out$SNP)) %>% 
