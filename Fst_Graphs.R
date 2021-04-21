@@ -978,8 +978,8 @@ bar_graph
 
 ggsave('Fig5_islands_differentiation_21.04.2021.tiff', 
        units = 'cm',
-       height = 10
-       width = 10,
+       height = 10,
+       width = 20,
        plot = bar_graph, 
        dpi = 'retina')
 
