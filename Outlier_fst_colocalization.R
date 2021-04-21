@@ -341,6 +341,9 @@ fst_window %>%
 #   filter(value == 'Overlapping locus')
 
 
+# Fst peaks and data filter -----------------------------------------------
+
+
 
 # Shared and non-shared regions -------------------------------------------
 # read_csv('GSBPI_Fst_Outliers_Combined_200Kb.csv')
