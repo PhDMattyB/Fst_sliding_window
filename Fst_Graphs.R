@@ -37,7 +37,7 @@ setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 
 # Both_outlier = read_csv('TSBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>%
 
-Both_outlier = read_csv('TSBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+Both_outlier = read_csv('SLGBPEL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -81,7 +81,7 @@ Both_outlier = read_csv('TSBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>%
     CHR == '39' ~ 'AC37',
     CHR == '0' ~ 'Contigs')))
 
-iso_outlier = read_csv('TSBPL_ISO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+iso_outlier = read_csv('SLGBPEL_ISO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>%
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -125,7 +125,7 @@ iso_outlier = read_csv('TSBPL_ISO_Colocalization_Fst_Outliers_200Kb.csv') %>%
     CHR == '39' ~ 'AC37',
     CHR == '0' ~ 'Contigs')))
 
-morpho_outlier = read_csv('TSBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+morpho_outlier = read_csv('SLGBPEL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>%
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -169,7 +169,7 @@ morpho_outlier = read_csv('TSBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv') 
     CHR == '39' ~ 'AC37',
     CHR == '0' ~ 'Contigs')))
 
-normal = read_csv('TSBPL_Fst_Neutral_200Kb_windows.19.04.2021.csv') %>%
+normal = read_csv('SLGBPEL_Fst_Neutral_200Kb_windows.19.04.2021.csv') %>%
   filter(FST_n > 3) %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -214,7 +214,7 @@ normal = read_csv('TSBPL_Fst_Neutral_200Kb_windows.19.04.2021.csv') %>%
     CHR == '0' ~ 'Contigs')))
 
 # fst_outlier = read_tsv('SLGPEL_Fst_outliers_200Kb_window.txt') %>%
-  fst_outlier = read_csv('TSBPL_Fst_200kb_outliers_19.04.2021.csv') %>% 
+  fst_outlier = read_csv('SLGBPEL_Fst_200kb_outliers_19.04.2021.csv') %>% 
 filter(FST_n > 3) %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -838,20 +838,26 @@ VBRSIL_plot_fst2
 # Bar graph ---------------------------------------------------------------
 
 setwd('~/Fst_sliding_window/')
-outliers = read_tsv('Polypops_colocalization_data_fig5.txt') %>% 
-  filter(value == 'Outlier') %>% 
-  group_by(population)
+# outliers = read_tsv('Polypops_colocalization_data_fig5.txt') %>% 
+#   filter(value == 'Outlier') %>% 
+#   group_by(population)
 
+outliers = read_csv('AllPops_Outlier_Colocalization_data.21.04.2021.csv') %>% 
+  group_by(Population)
 # outliers$population
 
-near_outliers = read_tsv('Polypops_colocalization_data_fig5.txt') %>% 
-  filter(value == 'Non-Outlier') %>% 
-  group_by(population)
+# near_outliers = read_tsv('Polypops_colocalization_data_fig5.txt') %>% 
+#   filter(value == 'Non-Outlier') %>% 
+#   group_by(population)
 # near_outliers$population
+near_outliers = read_csv('AllPops_Near_Outlier_data.21.04.2021.csv') %>% 
+  group_by(Population)
 
-neutral = read_tsv('Polypops_neutral_snps_data.txt') %>% 
-  group_by(population)
+# neutral = read_tsv('Polypops_neutral_snps_data.txt') %>% 
+#   group_by(population)
 
+neutral = read_csv('Allpops_neutral_snps_21.4.2021.csv') %>% 
+  group_by(Population)
 # setwd('~/Fst_sliding_window/SLGBPI/')
 # outliers = read_tsv('SLGBPI_Colocalization_data.txt') %>% 
 #   filter(value == 'Outlier')
@@ -897,31 +903,30 @@ mutate(class = as.factor(case_when(
   rowid == '2' ~ 'Outlier loci',
   rowid == '3' ~ 'Outlier loci',
   rowid == '4' ~ 'Outlier loci',
-  rowid == '5' ~ 'Outlier loci',
+  # rowid == '5' ~ 'Outlier loci',
   # rowid == '6' ~ 'Outlier loci',
+  rowid == '5' ~ 'Near outlier loci',
   rowid == '6' ~ 'Near outlier loci',
   rowid == '7' ~ 'Near outlier loci',
   rowid == '8' ~ 'Near outlier loci',
-  rowid == '9' ~ 'Near outlier loci',
-  rowid == '10' ~ 'Near outlier loci',
+  # rowid == '10' ~ 'Near outlier loci',
   # rowid == '12' ~ 'Near outlier loci',
+  rowid == '9' ~ 'Neutral loci',
+  rowid == '10' ~ 'Neutral loci',
   rowid == '11' ~ 'Neutral loci',
   rowid == '12' ~ 'Neutral loci',
-  rowid == '13' ~ 'Neutral loci',
-  rowid == '14' ~ 'Neutral loci',
-  rowid == '15' ~ 'Neutral loci',
+  # rowid == '15' ~ 'Neutral loci',
   # rowid == '18' ~ 'Neutral loci',
 
 ))) %>%
   mutate(full_morph = as.factor(case_when(
-    population == 'VBRSIL' ~ 'G: Benthic - Pelagic',
-    population == 'VBRSIL' ~ 'S: Benthic - Pelagic',
+    Population == 'GSBPI' ~ 'G: Benthic - Pelagic',
+    Population == 'SLGBPEL' ~ 'S: Benthic - Pelagic',
     # population == 'SLGBPL' ~ 'S: Benthic - Pelagic 1',
     # population == 'SLGBPI' ~ 'S: Benthic - Pelagic 2',
-    population == 'VBRSIL' ~ 'T: Benthic 1 - Pelagic',
-    population == 'VBRSIL' ~ 'T: Benthic 2 - Pelagic',
-    population == 'VBRSIL' ~ 'V: Benthic - Pelagic'))) %>%
-arrange(population)
+    Population == 'TLGBPL' ~ 'T: Benthic 1 - Pelagic',
+    Population == 'TSBPL' ~ 'T: Benthic 2 - Pelagic'))) %>%
+arrange(Population)
   # mutate(class = as.factor(case_when(
   #   rowid == '1' ~ 'Class 1',
   #   rowid == '2' ~ 'Class 2',
@@ -971,9 +976,14 @@ bar_graph = class_data %>%
 
 bar_graph
 
-ggsave('Fig5_islands_differentiation.tiff', 
+ggsave('Fig5_islands_differentiation_21.04.2021.tiff', 
+       units = 'cm',
+       height = 10
        width = 10,
-       plot = bar_graph)
+       plot = bar_graph, 
+       dpi = 'retina')
+
+##
 # combo and save ----------------------------------------------------------
 
 # combo = VBRSIL_plot_fst2 + VBRSIL_bar + plot_layout(widths = c(3, 1))

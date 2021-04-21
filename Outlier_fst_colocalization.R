@@ -33,7 +33,7 @@ data = read_tsv('TSBPL_fst.fst')
 data %>% 
   group_by(CHR)
 
-outliers = read_csv('TSBPL_Outlier_data.csv') %>% 
+outliers = read_csv('SLGBPEL_Outlier_data.csv') %>% 
   rename(SNP = `Marker ID`) %>% 
   select(SNP, 
          `#Chromosome`,
@@ -108,7 +108,7 @@ not_outliers = bind_cols(not_outliers,
                          grouping)
 
 write_tsv(not_outliers,
-          'TSBPL_Neutral_snps.txt', col_names = TRUE)
+          'SLGBPEL_Neutral_snps.txt', col_names = TRUE)
 
 # outliers$value
 overlap_outliers = outliers %>% 
@@ -182,25 +182,25 @@ morpho_fst = left_join(morpho_trait,
 
 ## write the three files as csvs
 write_tsv(BothTraits_Fst, 
-          'TSBPL_BOTHoutliers_Fst.txt')
+          'SLGBPEL_BOTHoutliers_Fst.txt')
 
 write_tsv(Iso_fst, 
-          'TSBPL_ISOoutliers_Fst.txt')
+          'SLGBPEL_ISOoutliers_Fst.txt')
 
 write_tsv(morpho_fst, 
-          'TSBPL_MORPHOoutliers_Fst.txt')
+          'SLGBPEL_MORPHOoutliers_Fst.txt')
 
 ## read in the neutral data
-df_nonout = read_tsv('TSBPL_Neutral_snps.txt')
+df_nonout = read_tsv('SLGBPEL_Neutral_snps.txt')
 
 ##read in the outlier data
 # df_outliers = read_tsv('GSBPI_outliers_Fst.txt')
 
-overlap_outs = read_tsv('TSBPL_BOTHoutliers_Fst.txt') %>% 
+overlap_outs = read_tsv('SLGBPEL_BOTHoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-iso_outs = read_tsv('TSBPL_ISOoutliers_Fst.txt') %>% 
+iso_outs = read_tsv('SLGBPEL_ISOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-morpho_outs = read_tsv('TSBPL_MORPHOoutliers_Fst.txt') %>% 
+morpho_outs = read_tsv('SLGBPEL_MORPHOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
 
 range_cal = function(data){
@@ -293,7 +293,7 @@ neutral_range_snps = neutral_range_snps %>%
 bind_rows(neutral_range_snps, 
                    outs) %>% 
   arrange(CHR, POS) %>% 
-  write_tsv('TSBPL_MORPHO_Outliers_Colocalization_data.txt')
+  write_tsv('SLGBPEL_MORPHO_Outliers_Colocalization_data.txt')
 
 ##  
 # Sliding window ----------------------------------------------------------
@@ -301,9 +301,9 @@ bind_rows(neutral_range_snps,
 # iso = read_tsv('GSBPI_ISOOutliers_Colocalization_data.txt')
 # morpho = read_tsv('GSBPI_MORPHOOutliers_Colocalization_data.txt')
 
-Both = read_tsv('TSBPL_BOTH_Outliers_Colocalization_data.txt')
-iso = read_tsv('TSBPL_ISO_Outliers_Colocalization_data.txt')
-morpho = read_tsv('TSBPL_MORPHO_Outliers_Colocalization_data.txt')
+Both = read_tsv('SLGBPEL_BOTH_Outliers_Colocalization_data.txt')
+iso = read_tsv('SLGBPEL_ISO_Outliers_Colocalization_data.txt')
+morpho = read_tsv('SLGBPEL_MORPHO_Outliers_Colocalization_data.txt')
 
 
 fst_window = winScan(x = morpho,
@@ -318,7 +318,7 @@ fst_window = winScan(x = morpho,
 fst_window %>%
   as_tibble() %>%
   filter(FST_n >3) %>%
-  write_csv('TSBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv',
+  write_csv('SLGBPEL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv',
             col_names = T)
 
 
@@ -343,7 +343,155 @@ fst_window %>%
 
 # Fst peaks and data filter -----------------------------------------------
 
+## Read in the data for the outliers
+TLGBPL_iso = read_tsv('TLGBPL_ISO_Outliers_Colocalization_data.txt')
+TLGBPL_morpho = read_tsv('TLGBPL_MORPHO_Outliers_Colocalization_data.txt')
+TLGBPL_both = read_tsv('TLGBPL_BOTH_Outliers_Colocalization_data.txt')
 
+## make labels for each group of snps
+iso_outlier = TLGBPL_iso %>% 
+  # filter(value == 'Isotope locus')
+  filter(value == 'Non-Outlier')
+
+# label = rep('Outlier', 
+#             length(iso_outlier$value)) %>% 
+#   as_tibble() %>% 
+#   rename(label = value)
+label = rep('Near Outlier',
+            length(iso_outlier$value)) %>%
+  as_tibble() %>%
+  rename(label = value)
+iso_outlier = bind_cols(iso_outlier, 
+                        label)
+
+
+morpho_outlier = TLGBPL_morpho %>% 
+  # filter(value == 'Morphological locus')
+  filter(value == 'Non-Outlier')
+label = rep('Near Outlier', 
+            length(morpho_outlier$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+morpho_outlier = bind_cols(morpho_outlier, 
+                        label)
+
+both_outlier = TLGBPL_both %>% 
+  # filter(value == 'Overlapping locus')
+  filter(value == 'Non-Outlier')
+label = rep('Near Outlier', 
+            length(both_outlier$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+both_outlier = bind_cols(both_outlier, 
+                        label)
+## write the csv for each population
+bind_rows(iso_outlier, 
+          morpho_outlier, 
+          both_outlier) %>% 
+  write_csv('TLGBPL_Near_Outlier_data_21.04.2021.csv')
+
+## Need to read in data and create a population column
+# GSBPI = read_csv('GSBPI_Outlier_Colocalization_data_21.04.2021.csv')
+GSBPI = read_csv('GSBPI_Near_Outlier_data_21.04.2021.csv')
+
+population = rep('GSBPI', length(GSBPI$label)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+GSBPI = bind_cols(GSBPI, 
+                  population)
+
+# SLGBPEL = read_csv('SLGBPEL_Outlier_Colocalization_data_21.04.2021.csv')
+SLGBPEL = read_csv('SLGBPEL_Near_Outlier_data_21.04.2021.csv')
+population = rep('SLGBPEL', length(SLGBPEL$label)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+SLGBPEL = bind_cols(SLGBPEL, 
+                  population)
+
+# TLGBPL = read_csv('TLGBPL_Outlier_Colocalization_data_21.04.2021.csv')
+TLGBPL = read_csv('TLGBPL_Near_Outlier_data_21.04.2021.csv')
+population = rep('TLGBPL', length(TLGBPL$label)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+TLGBPL = bind_cols(TLGBPL, 
+                  population)
+
+# TSBPL = read_csv('TSBPL_Outlier_Colocalization_data_21.04.2021.csv')
+TSBPL = read_csv('TSBPL_Near_Outlier_data_21.04.2021.csv')
+population = rep('TSBPL', length(TSBPL$label)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+TSBPL = bind_cols(TSBPL, 
+                  population)
+## write the csv
+bind_rows(GSBPI, 
+          SLGBPEL, 
+          TLGBPL, 
+          TSBPL) %>% 
+  write_csv('AllPops_Near_Outlier_data.21.04.2021.csv')
+
+
+## Need to find the neutral snps
+
+GSBPI_neutral = read_tsv('GSBPI_Neutral_snps.txt')
+label = rep('Neutral',
+            length(GSBPI_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+population = rep('GSBPI', 
+                 length(GSBPI_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+
+GSBPI_neutral = bind_cols(GSBPI_neutral, 
+          label, 
+          population)
+
+
+SLGBPEL_neutral = read_tsv('SLGBPEL_Neutral_snps.txt')
+label = rep('Neutral',
+            length(SLGBPEL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+population = rep('SLGBPEL', 
+                 length(SLGBPEL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+SLGBPEL_neutral = bind_cols(SLGBPEL_neutral, 
+                          label, 
+                          population)
+
+TLGBPL_neutral = read_tsv('TLGBPL_Neutral_snps.txt')
+label = rep('Neutral',
+            length(TLGBPL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+population = rep('TLGBPL', 
+                 length(TLGBPL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+TLGBPL_neutral = bind_cols(TLGBPL_neutral, 
+                            label, 
+                            population)
+
+TSBPL_neutral = read_tsv('TSBPL_Neutral_snps.txt')
+label = rep('Neutral',
+            length(TSBPL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+population = rep('TSBPL', 
+                 length(TSBPL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+TSBPL_neutral = bind_cols(TSBPL_neutral, 
+                            label, 
+                            population)
+
+bind_rows(GSBPI_neutral, 
+          SLGBPEL_neutral, 
+          TLGBPL_neutral, 
+          TSBPL_neutral) %>% 
+  write_csv('Allpops_neutral_snps_21.4.2021.csv')
 
 # Shared and non-shared regions -------------------------------------------
 # read_csv('GSBPI_Fst_Outliers_Combined_200Kb.csv')
