@@ -28,17 +28,13 @@ setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 ## Need to make sure we specify the --chr-set to 39
 ## and make sure the contigs or unplaced regions are 
 ## set to 0
-data = read_tsv('Galtabol_fst_NA.fst')
+data = read_tsv('Galtabol_chr_fix.fst') 
 data = read_tsv('TLGBPL_fst.fst')
 data = read_tsv('TSBPL_fst.fst')
 data = read_tsv('VBRSIL_fst.fst')
 # data = read_tsv('SLGBPL_fst.fst')
 # data = read_tsv('SLGBPI_fst.fst')
 data = read_tsv('SLGBPEL_fst.fst')
-
-gal_avg_fst = data %>% summarise(avg_fst = mean(FST))
-v_avg_fst = data %>% summarise(avg_fst = mean(FST))
-
 
 data %>% 
   group_by(CHR)
@@ -65,7 +61,7 @@ fst_position = fst_position %>%
 ## large window size == less chance to find differences
 
 write_tsv(fst_position, 
-          'VBRSIL_Fst_200Kb_window.txt')
+          'SLGBPEL_Fst_200Kb_window.txt')
 
 # Plot data ---------------------------------------------------------------
 
@@ -78,7 +74,7 @@ write_tsv(fst_position,
 
 # setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 
-data = read_tsv('GSBPI_Fst_200Kb_window.txt') %>% 
+data = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>% 
   mutate(AC_CHR = as.factor(case_when(
            CHR == '1' ~ 'AC01',
            CHR == '2' ~ 'AC02',
@@ -443,27 +439,24 @@ filter_data = data %>%
   ungroup()
 
 write_csv(filter_data, 
-          'GSBPI_Fst_Neutral_200Kb_windows.19.04.2021.csv')
+          'VBRSIL_Fst_Neutral_200Kb_windows.19.04.2021.csv')
 # filter_data %>%
 #   group_by(AC_CHR) %>% 
 #   summarise(n = n()) %>% 
 #   View()
 
 
-
-S_top5 = data[data$FST_mean > quantile(data$FST_mean, 
-                                     prob = 1-5/100),]
-
-
-G_top5 = filter_data[filter_data$FST_mean > quantile(filter_data$FST_mean, 
+V_top5 = filter_data[filter_data$FST_mean > quantile(filter_data$FST_mean, 
                                        prob = 1-5/100),]
 
-write_csv(G_top5, 'GSBPI_Fst_200kb_outliers_19.04.2021.csv')
+write_csv(V_top5, 
+          'VBRSIL_Fst_200kb_outliers_19.04.2021.csv')
 # View(G_top5)
+
 
 ## need to figure out the number of distinct outliers 
 ## THis is due to the high overlap between windows
-G_distinct_outliers = G_top5 %>% 
+V_distinct_outliers = V_top5 %>% 
   group_by(AC_CHR) %>% 
   distinct(FST_mean)
 
@@ -473,8 +466,8 @@ T1_distinct_outliers
 T2_distinct_outliers
 V_distinct_outliers
 
-write_csv(V_distinct_outliers, 
-          'VBRSIL_Fst_outliers_19.04.2021.csv')
+# write_csv(S_distinct_outliers, 
+#           'SLGBPEL_Fst_outliers_19.04.2021.csv')
 
 ## sort through the top 5% Fst outliers for each population
 G_top5 = G_top5 %>% 
@@ -488,38 +481,38 @@ T2_top5 = T2_top5 %>%
 V_top5 = V_top5 %>% 
   group_by(AC_CHR) 
 
-GS_intersect = dplyr::intersect(G_top5,
+dplyr::intersect(G_top5,
           S_top5,
           by = 'win_mid')
 
-GT1_intersect = dplyr::intersect(G_top5,
+dplyr::intersect(G_top5,
                                 T1_top5,
                                 by = 'win_mid')
 
-GT2_intersect = dplyr::intersect(G_top5,
+dplyr::intersect(G_top5,
                                  T2_top5,
                                  by = 'win_mid')
 
-GV_intersect = dplyr::intersect(G_top5,
+dplyr::intersect(G_top5,
                                  V_top5,
                                  by = 'win_mid')
-ST1_intersect = dplyr::intersect(S_top5,
+dplyr::intersect(S_top5,
                                  T1_top5,
                                  by = 'win_mid')
 
-ST2_intersect = dplyr::intersect(S_top5,
+dplyr::intersect(S_top5,
                                  T2_top5,
                                  by = 'win_mid')
-SV_intersect = dplyr::intersect(S_top5,
+dplyr::intersect(S_top5,
                                  V_top5,
                                  by = 'win_mid')
-T1T2_intersect = dplyr::intersect(T1_top5,
+dplyr::intersect(T1_top5,
                                 T2_top5,
                                 by = 'win_mid')
-T1V_intersect = dplyr::intersect(T1_top5,
+dplyr::intersect(T1_top5,
                                 V_top5,
                                 by = 'win_mid')
-T2V_intersect = dplyr::intersect(T2_top5,
+dplyr::intersect(T2_top5,
                                  V_top5,
                                  by = 'win_mid')
 
