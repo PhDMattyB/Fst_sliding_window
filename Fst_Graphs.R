@@ -31,7 +31,7 @@ Mb_Conversion = function(data){
 }
 
 
-setwd('~/PhD/SNP Demographic modelling/Outliers_directory/Fst_RDA_Colocalization')
+# setwd('~/PhD/SNP Demographic modelling/Outliers_directory/Fst_RDA_Colocalization')
 setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 
 
@@ -273,6 +273,57 @@ iso_outlier = Mb_Conversion(data = iso_outlier)
 morpho_outlier = Mb_Conversion(data = morpho_outlier)
 normal = Mb_Conversion(normal)
 fst_outlier = Mb_Conversion(data = fst_outlier)
+
+
+# Fst distributions - sliding window edition ------------------------------
+
+TSBPL_window_plot = normal %>% 
+  ggplot(aes(x = FST_mean))+
+  geom_density(fill = '#BF1B1B',
+               alpha = 0.7)+
+geom_density(data = iso_outlier,
+             aes(x = FST_mean),
+             fill = '#58F252',
+             alpha = 0.7)+
+geom_density(data = morpho_outlier,
+              aes(x = FST_mean),
+              fill = '#274F73',
+              alpha = 0.7)+
+geom_density(data = Both_outlier,
+             aes(x = FST_mean),
+             fill = '#F28705',
+             alpha = 0.7)+
+  geom_density(data = fst_outlier,
+               aes(x = FST_mean),
+               fill = '#C57ED9',
+               alpha = 0.7)+
+labs(x = 'Mean Fst per window', 
+     y = 'Frequency', 
+     title = 'Galtabol')+
+  # scale_fill_manual(values = '#BF1B1B')+
+  theme(panel.grid = element_blank(), 
+        axis.title = element_text(size = 14), 
+        # axis.title.x = element_blank(),
+        axis.text = element_text(size = 12), 
+        axis.ticks = element_line(size = 1), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(face = 'bold', 
+                                  size = 12), 
+        legend.position = 'none')
+
+
+GSBPI_window_plot
+SLGBPEL_window_plot
+TLGBPL_window_plot
+TSBPL_window_plot
+
+
+combo = (GSBPI_window_plot + SLGBPEL_window_plot)/(TLGBPL_window_plot + TSBPL_window_plot)
+
+ggsave('Fst_distribution_sliding_window_21.04.2021.tiff', 
+       plot = combo, 
+       units = 'cm', 
+       dpi = 'retina')
 
 ##
 # Fst outlier zoom 1-5 ----------------------------------------------------
