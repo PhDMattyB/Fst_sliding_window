@@ -74,7 +74,7 @@ write_tsv(fst_position,
 
 # setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 
-data = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>% 
+data = read_tsv('GSBPI_Fst_200Kb_window.txt') %>% 
   mutate(AC_CHR = as.factor(case_when(
            CHR == '1' ~ 'AC01',
            CHR == '2' ~ 'AC02',
@@ -264,6 +264,12 @@ Avg_fst_neutral = neutral_data %>%
 
 
 # Fst bar graph - outliers ------------------------------------------------
+G_top5 = read_csv('GSBPI_Fst_200kb_outliers_19.04.2021.csv')
+S_top5 = read_csv('SLGBPEL_Fst_200kb_outliers_19.04.2021.csv')
+T1_top5 = read_csv('TLGBPL_Fst_200kb_outliers_19.04.2021.csv')
+T2_top5 = read_csv('TSBPL_Fst_200kb_outliers_19.04.2021.csv')
+V_top5 = read_csv('VBRSIL_Fst_200kb_outliers_19.04.2021.csv')
+
 
 ## find top 5% Fst outliers
 G_top5 = data[data$FST_mean > quantile(data$FST_mean, 
@@ -283,7 +289,6 @@ label = rep('V: Benthic - pelagic',
 V_data = bind_cols(V_mean, 
                    label) %>% 
   rename(Morph_compare = value)
-
 
 G_data
 S_data 
