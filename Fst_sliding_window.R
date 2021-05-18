@@ -28,16 +28,181 @@ setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 ## Need to make sure we specify the --chr-set to 39
 ## and make sure the contigs or unplaced regions are 
 ## set to 0
-data = read_tsv('Galtabol_chr_fix.fst') 
-data = read_tsv('TLGBPL_fst.fst')
-data = read_tsv('TSBPL_fst.fst')
-data = read_tsv('VBRSIL_fst.fst')
+GSBPI_data = read_tsv('Galtabol_chr_fix.fst') %>% 
+  group_by(CHR) %>% 
+  filter(CHR != 0)
+TLGBPL_data = read_tsv('TLGBPL_fst.fst')%>% 
+  group_by(CHR)%>% 
+  filter(CHR != 0)
+TSBPL_data = read_tsv('TSBPL_fst.fst')%>% 
+  group_by(CHR)%>% 
+  filter(CHR != 0)
+VBRSIL_data = read_tsv('VBRSIL_fst.fst')%>% 
+  group_by(CHR)%>% 
+  filter(CHR != 0)
 # data = read_tsv('SLGBPL_fst.fst')
 # data = read_tsv('SLGBPI_fst.fst')
-data = read_tsv('SLGBPEL_fst.fst')
+SLGBPEL_data = read_tsv('SLGBPEL_fst.fst')%>% 
+  group_by(CHR)%>% 
+  filter(CHR != 0)
 
-data %>% 
-  group_by(CHR)
+
+# FST outliers SNP --------------------------------------------------------
+GSBPI_top5 = GSBPI_data[GSBPI_data$FST > quantile(GSBPI_data$FST, 
+                                                  prob = 1-5/100),]
+SLGBPEL_top5 = SLGBPEL_data[SLGBPEL_data$FST > quantile(SLGBPEL_data$FST, 
+                                                  prob = 1-5/100),]
+TLGBPL_top5 = TLGBPL_data[TLGBPL_data$FST > quantile(TLGBPL_data$FST, 
+                                                  prob = 1-5/100),]
+TSBPL_top5 = TSBPL_data[TSBPL_data$FST > quantile(TSBPL_data$FST, 
+                                                  prob = 1-5/100),]
+VBRSIL_top5 = VBRSIL_data[VBRSIL_data$FST > quantile(VBRSIL_data$FST, 
+                                                  prob = 1-5/100),]
+
+intersect(GSBPI_top5$SNP, 
+          SLGBPEL_top5$SNP) %>% 
+  as_tibble()
+intersect(GSBPI_top5$SNP, 
+          TLGBPL_top5$SNP) %>% 
+  as_tibble()
+intersect(GSBPI_top5$SNP, 
+          TSBPL_top5$SNP) %>% 
+  as_tibble()
+intersect(GSBPI_top5$SNP, 
+          VBRSIL_top5$SNP) %>% 
+  as_tibble()
+
+intersect(SLGBPEL_top5$SNP, 
+          TLGBPL_top5$SNP) %>% 
+  as_tibble()
+intersect(SLGBPEL_top5$SNP, 
+          TSBPL_top5$SNP) %>% 
+  as_tibble()
+intersect(SLGBPEL_top5$SNP, 
+          VBRSIL_top5$SNP) %>% 
+  as_tibble()
+
+intersect(TLGBPL_top5$SNP, 
+          TSBPL_top5$SNP) %>% 
+  as_tibble()
+
+intersect(TLGBPL_top5$SNP, 
+          VBRSIL_top5$SNP) %>% 
+  as_tibble()
+intersect(TSBPL_top5$SNP, 
+          VBRSIL_top5$SNP) %>% 
+  as_tibble()
+
+
+parallel = inner_join(GSBPI_top5, 
+                      SLGBPEL_top5, 
+                      by = 'SNP')
+parallel = inner_join(parallel, 
+                      TLGBPL_top5, 
+                      by = 'SNP')
+parallel = inner_join(parallel, 
+                      TSBPL_top5, 
+                      by = 'SNP')
+parallel = inner_join(parallel, 
+                      VBRSIL_top5, 
+                      by = 'SNP')
+
+theme_set(theme_bw())
+GSBPI_Outlier_Dist = ggplot(data = GSBPI_top5, 
+       aes(x = FST))+
+  geom_histogram(col = 'black',
+               fill = '#1A5173')+
+  # geom_dotplot(col = '#1A5173', 
+  #                fill = '#1A5173',
+  #              method = 'histodot',
+  #              binwidth = 1/100)+
+  xlim(0, 1.00)+
+  labs(x = 'Fst', 
+       y = 'Frequncy', 
+       title = 'Galtabol')+
+  theme(panel.grid = element_blank(), 
+        axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12))
+
+SLGBPEL_Outlier_Dist = ggplot(data = SLGBPEL_top5, 
+                            aes(x = FST))+
+  geom_histogram(col = 'black',
+               fill = '#3CA661')+
+  # geom_dotplot(col = '#3CA661', 
+  #              fill = '#3CA661',
+  #              method = 'histodot',
+  #              binwidth = 1/100)+
+  xlim(0,1.00)+
+  labs(x = 'Fst', 
+       y = 'Frequncy', 
+       title = 'Svinavatn')+
+  theme(panel.grid = element_blank(), 
+        axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12))
+
+TLGBPL_Outlier_Dist = ggplot(data = TLGBPL_top5, 
+                              aes(x = FST))+
+  geom_histogram(col = 'black',
+               fill = '#BF3030')+
+  # geom_dotplot(col = '#F2C230',
+  #              fill = '#F2C230',
+  #              method = 'histodot',
+  #              binwidth = 1/100)+
+  xlim(0,1.00)+
+  labs(x = 'Fst', 
+       y = 'Frequncy', 
+       title = 'Thingvallavatn 1')+
+  theme(panel.grid = element_blank(), 
+        axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12))
+
+TSBPL_Outlier_Dist = ggplot(data = TSBPL_top5, 
+                             aes(x = FST))+
+  geom_histogram(col = 'black',
+               fill = '#F28A80')+
+  # geom_dotplot(col = '#F28A80', 
+  #              fill = '#F28A80',
+  #              method = 'histodot',
+  #              binwidth = 1/100)+
+  xlim(0,1.00)+
+  labs(x = 'Fst', 
+       y = 'Frequncy', 
+       title = 'Thingvallavatn 2')+
+  theme(panel.grid = element_blank(), 
+        axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12))
+
+VBRSIL_Outlier_Dist = ggplot(data = VBRSIL_top5, 
+                            aes(x = FST))+
+  geom_histogram(col = 'black',
+               fill = '#F2C230')+
+  # geom_dotplot(col = '#BF3030', 
+  #              fill = '#BF3030',
+  #              method = 'histodot',
+  #              binwidth = 1/200)+
+  xlim(0,1.00)+
+  labs(x = 'Fst', 
+       y = 'Frequncy', 
+       title = 'Vatnshlidarvatn')+
+  theme(panel.grid = element_blank(), 
+        axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12))
+
+
+combo = GSBPI_Outlier_Dist/SLGBPEL_Outlier_Dist/TLGBPL_Outlier_Dist/TSBPL_Outlier_Dist/VBRSIL_Outlier_Dist
+
+ggsave('FST_outlier_distributions.tiff', 
+       plot = combo, 
+       dpi = 'retina', 
+       units = 'cm', 
+       width = 20, 
+       height = 25)
+
+
+# FST outliers 200Kb regions ----------------------------------------------
+
+
+
 # Sliding window analysis -------------------------------------------------
 
 ## This is performed on the lab computer
@@ -133,7 +298,11 @@ AC04q.1_29_split = function(data){
                    AC04q.1_29)
 }
 
-data = AC04q.1_29_split(data = data)
+GSBPI_data = AC04q.1_29_split(data = GSBPI_data)
+SLGPEL_data = AC04q.1_29_split(data = SLGBPEL_data)
+TLGBPL_data = AC04q.1_29_split(data = TLGBPL_data)
+TSBPL_data = AC04q.1_29_split(data = TSBPL_data)
+VBRSIL_data = AC04q.1_29_split(data = VBRSIL_data)
 
 # Conversion --------------------------------------------------------------
 
@@ -148,10 +317,7 @@ data = Mb_Conversion(data)
 #
 
 #
-# Fst outliers ------------------------------------------------------------
-
-## set the theme for all of the plots
-theme_set(theme_bw())
+# Fst outliers 200Kb regions------------------------------------------------------------
 
 data = data %>% 
   filter(FST_n > 3) %>% 
