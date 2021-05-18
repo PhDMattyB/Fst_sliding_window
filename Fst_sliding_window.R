@@ -205,36 +205,51 @@ GSBPI = read_tsv('GSBPI_Fst_200Kb_window.txt') %>%
   filter(CHR != 0, 
          FST_n >3) %>% 
   Mb_Conversion()
-GSBPI_200kb = read_csv('GSBPI_Fst_200kb_outliers_19.04.2021.csv')
+GSBPI_200kb = read_csv('GSBPI_Fst_200kb_outliers_19.04.2021.csv') %>% 
+  filter(AC_CHR != 'Contigs')
 
 SLGBPEL = read_tsv('SLGBPEL_Fst_200Kb_window.txt')%>% 
   filter(CHR != 0, 
          FST_n >3)%>% 
   Mb_Conversion()
-SLGBPEL_200kb = read_csv('SLGBPEL_Fst_200kb_outliers_19.04.2021.csv')
+SLGBPEL_200kb = read_csv('SLGBPEL_Fst_200kb_outliers_19.04.2021.csv') %>% 
+  filter(AC_CHR != 'Contigs')
 
 TLGBPL = read_tsv('TLGBPL_Fst_200Kb_window.txt')%>% 
   filter(CHR != 0, 
          FST_n >3)%>% 
   Mb_Conversion()
-TLGBPL_200kb = read_csv('TLGBPL_Fst_200kb_outliers_19.04.2021.csv')
+TLGBPL_200kb = read_csv('TLGBPL_Fst_200kb_outliers_19.04.2021.csv') %>% 
+  filter(AC_CHR != 'Contigs')
 
 TSBPL = read_tsv('TSBPL_Fst_200Kb_window.txt') %>% 
   filter(CHR != 0, 
          FST_n > 3)%>% 
   Mb_Conversion()
-TSBPL_200kb = read_csv('TSBPL_Fst_200kb_outliers_19.04.2021.csv')
+TSBPL_200kb = read_csv('TSBPL_Fst_200kb_outliers_19.04.2021.csv') %>% 
+  filter(AC_CHR != 'Contigs')
 
 VBRSIL = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>% 
   filter(CHR != 0, 
          FST_n > 3)%>% 
   Mb_Conversion()
-VBRSIL_200kb = read_csv('VBRSIL_Fst_200kb_outliers_19.04.2021.csv')
+VBRSIL_200kb = read_csv('VBRSIL_Fst_200kb_outliers_19.04.2021.csv') %>% 
+  filter(AC_CHR != 'Contigs')
 
 ## Need to pull out the Fst outliers from the Neutral dataset!!
 
+GSBPI = anti_join(GSBPI, 
+          GSBPI_200kb)
+SLGBPEL = anti_join(SLGBPEL, 
+                  SLGBPEL_200kb)
+TLGBPL = anti_join(TLGBPL, 
+                  TLGBPL_200kb)
+TSBPL = anti_join(TSBPL, 
+                  TSBPL_200kb)
+VBRSIL = anti_join(VBRSIL, 
+                  VBRSIL_200kb)
 
-ggplot()+
+Fst_neutral = ggplot()+
   geom_point(data = GSBPI, 
              aes(x = win_mid_mb, 
                  y = FST_mean), 
@@ -267,7 +282,7 @@ ggplot()+
   theme(panel.grid = element_blank(), 
         axis.title = element_text(size = 14), 
         axis.text.y = element_text(size = 12), 
-        axis.text.x = element_text(size = 10, 
+        axis.text.x = element_text(size = 8, 
                                    angle = 45, 
                                    hjust = 1, 
                                    vjust = 1), 
@@ -307,12 +322,22 @@ Fst_outliers = ggplot()+
   theme(panel.grid = element_blank(), 
         axis.title = element_text(size = 14), 
         axis.text.y = element_text(size = 12), 
-        axis.text.x = element_text(size = 10, 
+        axis.text.x = element_text(size = 8, 
                                    angle = 45, 
                                    hjust = 1, 
                                    vjust = 1), 
         strip.background = element_rect(fill = 'white'), 
         strip.text = element_text(colour = 'black'))
+
+Fst_combo = Fst_neutral/Fst_outliers
+
+ggsave('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/MeanFst_Neutral_Outliers.tiff', 
+       plot = Fst_combo, 
+       dpi = 'retina', 
+       units = 'cm', 
+       width = 45, 
+       height = 15)
+
 # Sliding window analysis -------------------------------------------------
 
 ## This is performed on the lab computer
