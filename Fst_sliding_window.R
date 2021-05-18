@@ -203,32 +203,80 @@ ggsave('FST_outlier_distributions.tiff',
 
 GSBPI = read_tsv('GSBPI_Fst_200Kb_window.txt') %>% 
   filter(CHR != 0, 
-         FST_n >3)
+         FST_n >3) %>% 
+  Mb_Conversion()
 GSBPI_200kb = read_csv('GSBPI_Fst_200kb_outliers_19.04.2021.csv')
 
 SLGBPEL = read_tsv('SLGBPEL_Fst_200Kb_window.txt')%>% 
   filter(CHR != 0, 
-         FST_n >3)
+         FST_n >3)%>% 
+  Mb_Conversion()
 SLGBPEL_200kb = read_csv('SLGBPEL_Fst_200kb_outliers_19.04.2021.csv')
 
 TLGBPL = read_tsv('TLGBPL_Fst_200Kb_window.txt')%>% 
   filter(CHR != 0, 
-         FST_n >3)
+         FST_n >3)%>% 
+  Mb_Conversion()
 TLGBPL_200kb = read_csv('TLGBPL_Fst_200kb_outliers_19.04.2021.csv')
 
 TSBPL = read_tsv('TSBPL_Fst_200Kb_window.txt') %>% 
   filter(CHR != 0, 
-         FST_n > 3)
+         FST_n > 3)%>% 
+  Mb_Conversion()
 TSBPL_200kb = read_csv('TSBPL_Fst_200kb_outliers_19.04.2021.csv')
 
 VBRSIL = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>% 
   filter(CHR != 0, 
-         FST_n > 3)
+         FST_n > 3)%>% 
+  Mb_Conversion()
 VBRSIL_200kb = read_csv('VBRSIL_Fst_200kb_outliers_19.04.2021.csv')
 
+ggplot()+
+  geom_point(data = GSBPI, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#1A5173', 
+             size = 3) +
+  facet_grid(~AC_CHR)
 
-
-
+ggplot()+
+  geom_point(data = GSBPI_200kb, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#1A5173', 
+             size = 3) +
+  geom_point(data = SLGBPEL_200kb, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#3CA661', 
+             size = 3) +
+  geom_point(data = TLGBPL_200kb, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#BF3030', 
+             size = 3) +
+  geom_point(data = TSBPL_200kb, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#F28A80', 
+             size = 3) +
+  geom_point(data = VBRSIL_200kb, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#F2C230', 
+             size = 3) +
+  facet_grid(~AC_CHR)+
+  labs(y = 'Mean Fst', 
+       x = 'Distance along chromosome (Mb)')+
+  theme(panel.grid = element_blank(), 
+        axis.title = element_text(size = 14), 
+        axis.text.y = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, 
+                                   angle = 45, 
+                                   hjust = 1, 
+                                   vjust = 1), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(colour = 'black'))
 # Sliding window analysis -------------------------------------------------
 
 ## This is performed on the lab computer
@@ -324,11 +372,7 @@ AC04q.1_29_split = function(data){
                    AC04q.1_29)
 }
 
-GSBPI_data = AC04q.1_29_split(data = GSBPI_data)
-SLGPEL_data = AC04q.1_29_split(data = SLGBPEL_data)
-TLGBPL_data = AC04q.1_29_split(data = TLGBPL_data)
-TSBPL_data = AC04q.1_29_split(data = TSBPL_data)
-VBRSIL_data = AC04q.1_29_split(data = VBRSIL_data)
+
 
 # Conversion --------------------------------------------------------------
 
