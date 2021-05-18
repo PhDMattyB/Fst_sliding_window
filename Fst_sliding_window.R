@@ -201,6 +201,32 @@ ggsave('FST_outlier_distributions.tiff',
 
 # FST outliers 200Kb regions ----------------------------------------------
 
+GSBPI = read_tsv('GSBPI_Fst_200Kb_window.txt') %>% 
+  filter(CHR != 0, 
+         FST_n >3)
+GSBPI_200kb = read_csv('GSBPI_Fst_200kb_outliers_19.04.2021.csv')
+
+SLGBPEL = read_tsv('SLGBPEL_Fst_200Kb_window.txt')%>% 
+  filter(CHR != 0, 
+         FST_n >3)
+SLGBPEL_200kb = read_csv('SLGBPEL_Fst_200kb_outliers_19.04.2021.csv')
+
+TLGBPL = read_tsv('TLGBPL_Fst_200Kb_window.txt')%>% 
+  filter(CHR != 0, 
+         FST_n >3)
+TLGBPL_200kb = read_csv('TLGBPL_Fst_200kb_outliers_19.04.2021.csv')
+
+TSBPL = read_tsv('TSBPL_Fst_200Kb_window.txt') %>% 
+  filter(CHR != 0, 
+         FST_n > 3)
+TSBPL_200kb = read_csv('TSBPL_Fst_200kb_outliers_19.04.2021.csv')
+
+VBRSIL = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>% 
+  filter(CHR != 0, 
+         FST_n > 3)
+VBRSIL_200kb = read_csv('VBRSIL_Fst_200kb_outliers_19.04.2021.csv')
+
+
 
 
 # Sliding window analysis -------------------------------------------------
