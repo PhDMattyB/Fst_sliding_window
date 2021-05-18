@@ -231,15 +231,50 @@ VBRSIL = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>%
   Mb_Conversion()
 VBRSIL_200kb = read_csv('VBRSIL_Fst_200kb_outliers_19.04.2021.csv')
 
+## Need to pull out the Fst outliers from the Neutral dataset!!
+
+
 ggplot()+
   geom_point(data = GSBPI, 
              aes(x = win_mid_mb, 
                  y = FST_mean), 
              col = '#1A5173', 
              size = 3) +
-  facet_grid(~AC_CHR)
+  geom_point(data = SLGBPEL, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#3CA661', 
+             size = 3) +
+  geom_point(data = TLGBPL, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#BF3030', 
+             size = 3) +
+  geom_point(data = TSBPL, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#F28A80', 
+             size = 3) +
+  geom_point(data = VBRSIL, 
+             aes(x = win_mid_mb, 
+                 y = FST_mean), 
+             col = '#F2C230', 
+             size = 3) +
+  facet_grid(~AC_CHR)+
+  labs(y = 'Mean Fst', 
+       x = 'Distance along chromosome (Mb)', 
+       title = 'A)')+
+  theme(panel.grid = element_blank(), 
+        axis.title = element_text(size = 14), 
+        axis.text.y = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, 
+                                   angle = 45, 
+                                   hjust = 1, 
+                                   vjust = 1), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(colour = 'black'))
 
-ggplot()+
+Fst_outliers = ggplot()+
   geom_point(data = GSBPI_200kb, 
              aes(x = win_mid_mb, 
                  y = FST_mean), 
@@ -267,7 +302,8 @@ ggplot()+
              size = 3) +
   facet_grid(~AC_CHR)+
   labs(y = 'Mean Fst', 
-       x = 'Distance along chromosome (Mb)')+
+       x = 'Distance along chromosome (Mb)', 
+       title = 'B)')+
   theme(panel.grid = element_blank(), 
         axis.title = element_text(size = 14), 
         axis.text.y = element_text(size = 12), 
