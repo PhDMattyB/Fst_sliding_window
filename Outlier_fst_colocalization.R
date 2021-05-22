@@ -936,3 +936,131 @@ pairwise.t.test(data$FST,
                 data$value,
                 p.adjust.method = 'bonferroni')
 
+
+
+
+# Differentiation peak range cal ------------------------------------------
+
+# Galtabol peak sizes -----------------------------------------------------
+
+G_Both = read_tsv('GSBPI_BOTHOutliers_Colocalization_data.txt')
+G_iso = read_tsv('GSBPI_ISOOutliers_Colocalization_data.txt')
+G_morpho = read_tsv('GSBPI_MORPHOOutliers_Colocalization_data.txt')
+
+View(G_Both)
+
+G_peak1 = G_Both %>% 
+  slice(1:9)
+G_peak1_size = (G_peak1[9,3]-G_peak1[1,3])/1000000
+
+G_peak2 = G_Both %>% 
+  slice(10:13)
+G_peak2_size = (G_peak2[4,3]-G_peak1[1,3])/1000000
+
+G_peak3 = G_Both %>% 
+  slice(14:18)
+G_peak3_size = (G_peak3[5,3]-G_peak3[1,3])/1000000
+
+G_peak4 = G_Both %>% 
+  slice(19:20)
+G_peak4_size = (G_peak4[2,3]-G_peak4[1,3])/1000000
+
+G_peak5 = G_Both %>% 
+  slice(21:25)
+G_peak5_size = (G_peak5[5,3]-G_peak5[1,3])/1000000
+
+G_peak6 = G_Both %>% 
+  slice(28:29)
+G_peak6_size = (G_peak6[2,3]-G_peak6[1,3])/1000000
+
+G_peak7 = G_Both %>% 
+  slice(30:40)
+G_peak7_size = (G_peak7[11,3]-G_peak7[1,3])/1000000
+
+G_peak8 = G_Both %>% 
+  slice(41:44)
+G_peak8_size = (G_peak8[4,3]-G_peak8[1,3])/1000000
+
+G_peak9 = G_Both %>% 
+  slice(45:49)
+G_peak9_size = (G_peak9[5,3]-G_peak9[1,3])/1000000
+
+G_peak10 = G_Both %>% 
+  slice(50:53)
+G_peak10_size = (G_peak10[4,3]-G_peak10[1,3])/1000000
+
+G_peak11 = G_Both %>% 
+  slice(54:56)
+G_peak11_size = (G_peak11[3,3]-G_peak11[1,3])/1000000
+
+G_peak12 = G_Both %>% 
+  slice(57:59)
+G_peak12_size = (G_peak12[3,3]-G_peak12[1,3])/1000000
+
+G_peak13 = G_Both %>% 
+  slice(61:64)
+G_peak13_size = (G_peak13[4,3]-G_peak13[1,3])/1000000
+
+G_peak14 = G_Both %>% 
+  slice(65:68)
+G_peak14_size = (G_peak14[4,3]-G_peak14[1,3])/1000000
+
+G_peak15 = G_Both %>% 
+  slice(70:72)
+G_peak15_size = (G_peak15[3,3]-G_peak15[1,3])/1000000
+
+G_peak16 = G_Both %>% 
+  slice(73:75)
+G_peak16_size = (G_peak16[3,3]-G_peak16[1,3])/1000000
+
+G_peak17 = G_Both %>% 
+  slice(76:80)
+G_peak17_size = (G_peak17[5,3]-G_peak17[1,3])/1000000
+
+G_peak18 = G_Both %>% 
+  slice(81:84)
+G_peak18_size = (G_peak18[4,3]-G_peak18[1,3])/1000000
+
+G_peak19 = G_Both %>% 
+  slice(85:92)
+G_peak19_size = (G_peak19[8,3]-G_peak19[1,3])/1000000
+
+G_peak20 = G_Both %>% 
+  slice(93:95)
+G_peak20_size = (G_peak20[3,3]-G_peak20[1,3])/1000000
+
+G_peak21 = G_Both %>% 
+  slice(96:98)
+G_peak21_size = (G_peak21[3,3]-G_peak21[1,3])/1000000
+
+G_peak22 = G_Both %>% 
+  slice(99:103)
+G_peak22_size = (G_peak22[5,3]-G_peak22[1,3])/1000000
+
+G_peak23 = G_Both %>% 
+  slice(104:105)
+G_peak23_size = (G_peak23[2,3]-G_peak23[1,3])/1000000
+
+G_peak24 = G_Both %>% 
+  slice(106:120)
+G_peak24_size = (G_peak24[15,3]-G_peak24[1,3])/1000000
+
+G_peak25 = G_Both %>% 
+  slice(121:125)
+G_peak25_size = (G_peak25[5,3]-G_peak25[1,3])/1000000
+
+G_peak26 = G_Both %>% 
+  slice(126:128)
+G_peak26_size = (G_peak26[3,3]-G_peak26[1,3])/1000000
+
+G_peak27 = G_Both %>% 
+  slice(129:134)
+G_peak27_size = (G_peak27[6,3]-G_peak27[1,3])/1000000
+
+G_peak28 = G_Both %>% 
+  slice(135:138)
+G_peak28_size = (G_peak28[4,3]-G_peak28[1,3])/1000000
+
+G_peak29 = G_Both %>% 
+  slice(139:151)
+G_peak29_size = (G_peak29[13,3]-G_peak29[1,3])/1000000
