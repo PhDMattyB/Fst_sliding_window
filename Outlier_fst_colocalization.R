@@ -191,16 +191,16 @@ write_tsv(morpho_fst,
           'SLGBPEL_MORPHOoutliers_Fst.txt')
 
 ## read in the neutral data
-df_nonout = read_tsv('SLGBPEL_Neutral_snps.txt')
+df_nonout = read_tsv('GSBPI_Neutral_snps.txt')
 
 ##read in the outlier data
 # df_outliers = read_tsv('GSBPI_outliers_Fst.txt')
 
-overlap_outs = read_tsv('SLGBPEL_BOTHoutliers_Fst.txt') %>% 
+overlap_outs = read_tsv('GSBPI_BOTHoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-iso_outs = read_tsv('SLGBPEL_ISOoutliers_Fst.txt') %>% 
+iso_outs = read_tsv('GSBPI_ISOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-morpho_outs = read_tsv('SLGBPEL_MORPHOoutliers_Fst.txt') %>% 
+morpho_outs = read_tsv('GSBPI_MORPHOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
 
 range_cal = function(data){
@@ -216,6 +216,7 @@ range_cal = function(data){
 overlap_outs = range_cal(overlap_outs)
 iso_outs = range_cal(iso_outs)
 morpho_outs = range_cal(morpho_outs)
+
 
 # df_outliers = range_cal(df_outliers)
 # View(df_outliers)
@@ -294,6 +295,13 @@ bind_rows(neutral_range_snps,
                    outs) %>% 
   arrange(CHR, POS) %>% 
   write_tsv('SLGBPEL_MORPHO_Outliers_Colocalization_data.txt')
+
+
+# Cal peak size -----------------------------------------------------------
+
+G_OVERLAP_df_list = list_of_dfs
+
+G_OVERLAP_df_list$`Affx-472339126`
 
 ##  
 # Sliding window ----------------------------------------------------------
@@ -966,8 +974,8 @@ G_peak4 = G_Both %>%
 G_peak4_size = (G_peak4[2,3]-G_peak4[1,3])/1000000
 
 G_peak5 = G_Both %>% 
-  slice(21:25)
-G_peak5_size = (G_peak5[5,3]-G_peak5[1,3])/1000000
+  slice(21:26)
+G_peak5_size = (G_peak5[6,3]-G_peak5[1,3])/1000000
 
 G_peak6 = G_Both %>% 
   slice(28:29)
@@ -1062,5 +1070,13 @@ G_peak28 = G_Both %>%
 G_peak28_size = (G_peak28[4,3]-G_peak28[1,3])/1000000
 
 G_peak29 = G_Both %>% 
-  slice(139:151)
-G_peak29_size = (G_peak29[13,3]-G_peak29[1,3])/1000000
+  slice(139:144)
+G_peak29_size = (G_peak29[6,3]-G_peak29[1,3])/1000000
+
+G_peak30 = G_Both %>% 
+  slice(140:146)
+G_peak30_size = (G_peak30[7,3]-G_peak30[1,3])/1000000
+
+G_peak31 = G_Both %>% 
+  slice(140:146)
+G_peak31_size = (G_peak31[7,3]-G_peak31[1,3])/1000000
