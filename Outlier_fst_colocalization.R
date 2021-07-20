@@ -196,11 +196,11 @@ df_nonout = read_tsv('GSBPI_Neutral_snps.txt')
 ##read in the outlier data
 # df_outliers = read_tsv('GSBPI_outliers_Fst.txt')
 
-overlap_outs = read_tsv('GSBPI_BOTHoutliers_Fst.txt') %>% 
+overlap_outs = read_tsv('TSBPL_BOTHoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-iso_outs = read_tsv('GSBPI_ISOoutliers_Fst.txt') %>% 
+iso_outs = read_tsv('TSBPL_ISOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-morpho_outs = read_tsv('GSBPI_MORPHOoutliers_Fst.txt') %>% 
+morpho_outs = read_tsv('TSBPL_MORPHOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
 
 range_cal = function(data){
@@ -304,15 +304,6 @@ bind_rows(neutral_range_snps,
 
 # Cal peak size -----------------------------------------------------------
 
-G_OVERLAP_df_list = list_of_dfs
-
-G_OVERLAP_df_list$`Affx-472339126`
-
-G_OVERLAP_df_list$`Affx-472339126` %>% 
-  summarise(last_pos = last(POS), 
-            first_pos = first(POS)) %>% 
-  mutate(peak_dist = last_pos - first_pos) %>% 
-  mutate(Mb_peak_dist = peak_dist/1000000)
 
 peak_cal = function(data){
   data %>% 
@@ -322,25 +313,15 @@ peak_cal = function(data){
     mutate(Mb_peak_dist = peak_dist/1000000)
 }
 
-lapply(G_OVERLAP_df_list, 
+peak_size = lapply(list_of_dfs, 
        peak_cal)
 
-G_test = lapply(G_OVERLAP_df_list, 
-                function(x){summarise(last_pos = last(POS), 
-                            first_pos = first(POS)) %>% 
-                    mutate(peak_dist = last_pos - first_pos) %>% 
-                    mutate(Mb_peak_dist = peak_dist/1000000)
-                }) 
-  
-for (i in 1:length(G_OVERLAP_df_list)){
-   summarise(G_OVERLAP_df_list[[i]],
-             last_pos = last(POS), 
-             first_pos = first(POS))%>% 
-    mutate(peak_dist = last_pos - first_pos) %>% 
-    mutate(Mb_peak_dist = peak_dist/1000000) 
-}
-
-
+peak_df = bind_rows(peak_size, 
+          .id = "column_label") %>% 
+  summarise(mean_peak_dist = mean(peak_dist), 
+            mean_peak_Mb = mean(Mb_peak_dist),
+            sd_peak_Mb = sd(Mb_peak_dist))
+peak_df
 
 ##  
 # Sliding window ----------------------------------------------------------
