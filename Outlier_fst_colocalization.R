@@ -33,7 +33,7 @@ data = read_tsv('TSBPL_fst.fst')
 data %>% 
   group_by(CHR)
 
-outliers = read_csv('GSBPI_Outlier_data.csv') %>% 
+outliers = read_csv('TSBPL_Outlier_data.csv') %>% 
   rename(SNP = `Marker ID`) %>% 
   select(SNP, 
          `#Chromosome`,
@@ -42,6 +42,51 @@ outliers = read_csv('GSBPI_Outlier_data.csv') %>%
          CHROME3, 
          value) %>% 
   arrange(SNP)
+
+
+# RDA outliers vs other loci ----------------------------------------------
+
+RDA_outliers = inner_join(outliers, 
+           data, 
+           by = 'SNP')
+RDA_label = rep('RDA_outlier', 
+                nrow(RDA_outliers)) %>% 
+  as_tibble()
+RDA_outliers = bind_cols(RDA_outliers, 
+                         RDA_label)%>% 
+  select(CHR, 
+         SNP, 
+         POS, 
+         NMISS, 
+         FST, 
+         value...11) %>% 
+  rename(value = value...11)
+
+Neutral_snps = anti_join(data, 
+          outliers, 
+          by = 'SNP')
+neutral_label = rep('Neutral', 
+                    nrow(Neutral_snps)) %>% 
+  as_tibble()
+
+Neutral_snps = bind_cols(Neutral_snps, 
+                         neutral_label)
+
+ultimate_data = bind_rows(RDA_outliers, 
+                          Neutral_snps)
+
+ultimate_data %>% 
+  ggplot(aes(x = value, 
+             y = FST))+
+  geom_violin()
+
+ultimate_data %>% 
+  group_by(value) %>% 
+  summarise(mean_FST = mean(FST))
+
+aov_test = aov(data = ultimate_data, 
+               FST ~ value)
+summary(aov_test)
 
 ##
 # Old shit we don't need anymore ------------------------------------------

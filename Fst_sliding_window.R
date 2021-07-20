@@ -110,9 +110,9 @@ parallel = inner_join(parallel,
 
 theme_set(theme_bw())
 GSBPI_Outlier_Dist = ggplot(data = GSBPI_top5, 
-       aes(x = FST))+
+                            aes(x = FST))+
   geom_histogram(col = 'black',
-               fill = '#1A5173')+
+                 fill = '#1A5173')+
   # geom_dotplot(col = '#1A5173', 
   #                fill = '#1A5173',
   #              method = 'histodot',
@@ -126,9 +126,9 @@ GSBPI_Outlier_Dist = ggplot(data = GSBPI_top5,
         axis.text = element_text(size = 12))
 
 SLGBPEL_Outlier_Dist = ggplot(data = SLGBPEL_top5, 
-                            aes(x = FST))+
+                              aes(x = FST))+
   geom_histogram(col = 'black',
-               fill = '#3CA661')+
+                 fill = '#3CA661')+
   # geom_dotplot(col = '#3CA661', 
   #              fill = '#3CA661',
   #              method = 'histodot',
@@ -142,9 +142,9 @@ SLGBPEL_Outlier_Dist = ggplot(data = SLGBPEL_top5,
         axis.text = element_text(size = 12))
 
 TLGBPL_Outlier_Dist = ggplot(data = TLGBPL_top5, 
-                              aes(x = FST))+
+                             aes(x = FST))+
   geom_histogram(col = 'black',
-               fill = '#BF3030')+
+                 fill = '#BF3030')+
   # geom_dotplot(col = '#F2C230',
   #              fill = '#F2C230',
   #              method = 'histodot',
@@ -158,9 +158,9 @@ TLGBPL_Outlier_Dist = ggplot(data = TLGBPL_top5,
         axis.text = element_text(size = 12))
 
 TSBPL_Outlier_Dist = ggplot(data = TSBPL_top5, 
-                             aes(x = FST))+
+                            aes(x = FST))+
   geom_histogram(col = 'black',
-               fill = '#F28A80')+
+                 fill = '#F28A80')+
   # geom_dotplot(col = '#F28A80', 
   #              fill = '#F28A80',
   #              method = 'histodot',
@@ -174,9 +174,9 @@ TSBPL_Outlier_Dist = ggplot(data = TSBPL_top5,
         axis.text = element_text(size = 12))
 
 VBRSIL_Outlier_Dist = ggplot(data = VBRSIL_top5, 
-                            aes(x = FST))+
+                             aes(x = FST))+
   geom_histogram(col = 'black',
-               fill = '#F2C230')+
+                 fill = '#F2C230')+
   # geom_dotplot(col = '#BF3030', 
   #              fill = '#BF3030',
   #              method = 'histodot',
@@ -240,15 +240,15 @@ VBRSIL_200kb = read_csv('VBRSIL_Fst_200kb_outliers_19.04.2021.csv') %>%
 ## Need to pull out the Fst outliers from the Neutral dataset!!
 
 GSBPI = anti_join(GSBPI, 
-          GSBPI_200kb)
+                  GSBPI_200kb)
 SLGBPEL = anti_join(SLGBPEL, 
-                  SLGBPEL_200kb)
+                    SLGBPEL_200kb)
 TLGBPL = anti_join(TLGBPL, 
-                  TLGBPL_200kb)
+                   TLGBPL_200kb)
 TSBPL = anti_join(TSBPL, 
                   TSBPL_200kb)
 VBRSIL = anti_join(VBRSIL, 
-                  VBRSIL_200kb)
+                   VBRSIL_200kb)
 
 Fst_neutral = ggplot()+
   geom_point(data = GSBPI, 
