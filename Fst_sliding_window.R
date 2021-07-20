@@ -47,6 +47,7 @@ SLGBPEL_data = read_tsv('SLGBPEL_fst.fst')%>%
   filter(CHR != 0)
 
 
+
 # FST outliers SNP --------------------------------------------------------
 GSBPI_top5 = GSBPI_data[GSBPI_data$FST > quantile(GSBPI_data$FST, 
                                                   prob = 1-5/100),]
@@ -376,46 +377,46 @@ write_tsv(fst_position,
 
 data = read_tsv('GSBPI_Fst_200Kb_window.txt') %>% 
   mutate(AC_CHR = as.factor(case_when(
-           CHR == '1' ~ 'AC01',
-           CHR == '2' ~ 'AC02',
-           CHR == '3' ~ 'AC03',
-           CHR == '4' ~ 'AC04p',
-           CHR == '5' ~ 'AC04q.1:29',
-           CHR == '6' ~ 'AC04q.2',
-           CHR == '7' ~ 'AC05',
-           CHR == '8' ~ 'AC06',
-           CHR == '9' ~ 'AC06',
-           CHR == '10' ~ 'AC07',
-           CHR == '11' ~ 'AC08',
-           CHR == '12' ~ 'AC09',
-           CHR == '13' ~ 'AC10',
-           CHR == '14' ~ 'AC11',
-           CHR == '15' ~ 'AC12',
-           CHR == '16' ~ 'AC13',
-           CHR == '17' ~ 'AC14',
-           CHR == '18' ~ 'AC15',
-           CHR == '19' ~ 'AC16',
-           CHR == '20' ~ 'AC17',
-           CHR == '21' ~ 'AC18',
-           CHR == '22' ~ 'AC19',
-           CHR == '23' ~ 'AC20',
-           CHR == '24' ~ 'AC21',
-           CHR == '25' ~ 'AC22',
-           CHR == '26' ~ 'AC23',
-           CHR == '27' ~ 'AC24',
-           CHR == '28' ~ 'AC25',
-           CHR == '29' ~ 'AC26',
-           CHR == '30' ~ 'AC27',
-           CHR == '31' ~ 'AC28',
-           CHR == '32' ~ 'AC30',
-           CHR == '33' ~ 'AC31',
-           CHR == '34' ~ 'AC32',
-           CHR == '35' ~ 'AC33',
-           CHR == '36' ~ 'AC34',
-           CHR == '37' ~ 'AC35',
-           CHR == '38' ~ 'AC36',
-           CHR == '39' ~ 'AC37',
-           CHR == '0' ~ 'Contigs')))
+    CHR == '1' ~ 'AC01',
+    CHR == '2' ~ 'AC02',
+    CHR == '3' ~ 'AC03',
+    CHR == '4' ~ 'AC04p',
+    CHR == '5' ~ 'AC04q.1:29',
+    CHR == '6' ~ 'AC04q.2',
+    CHR == '7' ~ 'AC05',
+    CHR == '8' ~ 'AC06',
+    CHR == '9' ~ 'AC06',
+    CHR == '10' ~ 'AC07',
+    CHR == '11' ~ 'AC08',
+    CHR == '12' ~ 'AC09',
+    CHR == '13' ~ 'AC10',
+    CHR == '14' ~ 'AC11',
+    CHR == '15' ~ 'AC12',
+    CHR == '16' ~ 'AC13',
+    CHR == '17' ~ 'AC14',
+    CHR == '18' ~ 'AC15',
+    CHR == '19' ~ 'AC16',
+    CHR == '20' ~ 'AC17',
+    CHR == '21' ~ 'AC18',
+    CHR == '22' ~ 'AC19',
+    CHR == '23' ~ 'AC20',
+    CHR == '24' ~ 'AC21',
+    CHR == '25' ~ 'AC22',
+    CHR == '26' ~ 'AC23',
+    CHR == '27' ~ 'AC24',
+    CHR == '28' ~ 'AC25',
+    CHR == '29' ~ 'AC26',
+    CHR == '30' ~ 'AC27',
+    CHR == '31' ~ 'AC28',
+    CHR == '32' ~ 'AC30',
+    CHR == '33' ~ 'AC31',
+    CHR == '34' ~ 'AC32',
+    CHR == '35' ~ 'AC33',
+    CHR == '36' ~ 'AC34',
+    CHR == '37' ~ 'AC35',
+    CHR == '38' ~ 'AC36',
+    CHR == '39' ~ 'AC37',
+    CHR == '0' ~ 'Contigs')))
 
 # Split AC04q.1:29 --------------------------------------------------------
 
@@ -456,7 +457,7 @@ data = data %>%
   ungroup()
 
 top5 = data[data$FST_mean > quantile(data$FST_mean, 
-                              prob = 1-5/100),]
+                                     prob = 1-5/100),]
 
 ## need to combine the overlap and fst results for each popn
 top5_overlap = read_tsv('Fst_window_overlap_allBPpairs.txt')
@@ -465,8 +466,8 @@ overlap_regions = data %>%
   filter(AC_CHR %in% c('AC24', 'AC25'))
 
 overlap = inner_join(overlap_regions, 
-           top5_overlap, 
-           by = 'win_mid') %>% 
+                     top5_overlap, 
+                     by = 'win_mid') %>% 
   select(-AC_CHR.y) %>% 
   rename(AC_CHR = AC_CHR.x) %>% 
   group_by(AC_CHR) 
@@ -495,15 +496,15 @@ T_top5 = data[data$FST_mean > quantile(data$FST_mean,
 write_tsv(T_top5, 
           'VBRSIL_Fst_outliers_200Kb_window.txt')
 T_neutral = anti_join(data, 
-                       T_top5, 
-          by = c('win_start', 
-                 'win_end', 
-                 'win_mid', 
-                 'FST_n',
-                 'FST_mean', 
-                 'FST_sd', 
-                 'AC_CHR', 
-                 'win_mid_mb'))
+                      T_top5, 
+                      by = c('win_start', 
+                             'win_end', 
+                             'win_mid', 
+                             'FST_n',
+                             'FST_mean', 
+                             'FST_sd', 
+                             'AC_CHR', 
+                             'win_mid_mb'))
 write_tsv(T_neutral, 
           'VBRSIL_Fst_neutral_200Kb_window.txt')
 
@@ -516,7 +517,7 @@ label = rep('V: Benthic - pelagic',
   as_tibble()
 ## Bind that back together
 V_neutral_data = bind_cols(V_neutral_mean, 
-                   label) %>% 
+                           label) %>% 
   rename(Morph_compare = value)
 
 
@@ -570,7 +571,7 @@ V_top5 = read_csv('VBRSIL_Fst_200kb_outliers_19.04.2021.csv')
 
 ## find top 5% Fst outliers
 G_top5 = data[data$FST_mean > quantile(data$FST_mean, 
-                                     prob = 1-5/100),]
+                                       prob = 1-5/100),]
 
 write_tsv(G_top5, 
           'GSBPI_Fst_outliers_200Kb_window.txt')
@@ -580,7 +581,7 @@ V_mean = V_top5 %>%
   summarise(avg_fst = mean(FST_mean))
 ## need a population label for the data frame
 label = rep('V: Benthic - pelagic', 
-    length(V_mean$avg_fst)) %>% 
+            length(V_mean$avg_fst)) %>% 
   as_tibble()
 ## Bind that back together
 V_data = bind_cols(V_mean, 
@@ -613,9 +614,9 @@ new_colors = c('#88A825',
 Avg_fst_outliers = outlier_data %>% 
   ggplot()+
   geom_bar(aes(x = AC_CHR, 
-           y = avg_fst, 
-           # col = Morph_compare, 
-           fill = Morph_compare),
+               y = avg_fst, 
+               # col = Morph_compare, 
+               fill = Morph_compare),
            stat = 'identity', 
            position = 'dodge')+
   # scale_color_manual(values = new_colors)+
@@ -665,7 +666,7 @@ G_hist = ggplot(data = data)+
         axis.title.y = element_text(size = 12),
         axis.ticks = element_line(size = 2),
         # axis.title.x = element_blank()
-        )
+  )
 
 V_hist 
 
@@ -674,12 +675,12 @@ V_hist
 
 ## plot of Fst including outliers per chromosome
 V_fst = ggplot(data = data,
-         aes(x = win_mid_mb,
-             y = FST_mean, 
-             group = AC_CHR)) +
+               aes(x = win_mid_mb,
+                   y = FST_mean, 
+                   group = AC_CHR)) +
   geom_point(col = '#3E423A')+
-    # geom_smooth(col = '#1F2440',
-    #             size = 2)+
+  # geom_smooth(col = '#1F2440',
+  #             size = 2)+
   geom_point(data = top5, 
              aes(x = win_mid_mb, 
                  y = FST_mean, 
@@ -749,7 +750,7 @@ write_csv(filter_data,
 
 
 V_top5 = filter_data[filter_data$FST_mean > quantile(filter_data$FST_mean, 
-                                       prob = 1-5/100),]
+                                                     prob = 1-5/100),]
 
 write_csv(V_top5, 
           'VBRSIL_Fst_200kb_outliers_19.04.2021.csv')
@@ -784,39 +785,39 @@ V_top5 = V_top5 %>%
   group_by(AC_CHR) 
 
 dplyr::intersect(G_top5,
-          S_top5,
-          by = 'win_mid')
+                 S_top5,
+                 by = 'win_mid')
 
 dplyr::intersect(G_top5,
-                                T1_top5,
-                                by = 'win_mid')
+                 T1_top5,
+                 by = 'win_mid')
 
 dplyr::intersect(G_top5,
-                                 T2_top5,
-                                 by = 'win_mid')
+                 T2_top5,
+                 by = 'win_mid')
 
 dplyr::intersect(G_top5,
-                                 V_top5,
-                                 by = 'win_mid')
+                 V_top5,
+                 by = 'win_mid')
 dplyr::intersect(S_top5,
-                                 T1_top5,
-                                 by = 'win_mid')
+                 T1_top5,
+                 by = 'win_mid')
 
 dplyr::intersect(S_top5,
-                                 T2_top5,
-                                 by = 'win_mid')
+                 T2_top5,
+                 by = 'win_mid')
 dplyr::intersect(S_top5,
-                                 V_top5,
-                                 by = 'win_mid')
+                 V_top5,
+                 by = 'win_mid')
 dplyr::intersect(T1_top5,
-                                T2_top5,
-                                by = 'win_mid')
+                 T2_top5,
+                 by = 'win_mid')
 dplyr::intersect(T1_top5,
-                                V_top5,
-                                by = 'win_mid')
+                 V_top5,
+                 by = 'win_mid')
 dplyr::intersect(T2_top5,
-                                 V_top5,
-                                 by = 'win_mid')
+                 V_top5,
+                 by = 'win_mid')
 
 
 # tests = intersect(tests, 
@@ -886,17 +887,17 @@ theme_set(theme_bw())
 plot_fst = data %>% 
   filter(FST_n > 3) %>% 
   ggplot(aes(x = win_mid_mb,
-           y = FST_mean, 
-           group = AC_CHR)) +
+             y = FST_mean, 
+             group = AC_CHR)) +
   geom_point(col = 'grey49')+
   # geom_step(aes(x = win_mid,
   #               y = FST_mean),
   #           direction = 'mid',
   #           size = 2,
   #           col = '#1F2440')+
-    geom_smooth(col = '#1F2440',
-      # col = '#02E084',
-                size = 2)+
+  geom_smooth(col = '#1F2440',
+              # col = '#02E084',
+              size = 2)+
   facet_grid(~ AC_CHR, 
              scales = 'free')+
   labs(title = 'SLGBPEL Fst 200kb window', 

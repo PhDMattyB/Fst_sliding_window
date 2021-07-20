@@ -33,7 +33,7 @@ data = read_tsv('TSBPL_fst.fst')
 data %>% 
   group_by(CHR)
 
-outliers = read_csv('SLGBPEL_Outlier_data.csv') %>% 
+outliers = read_csv('GSBPI_Outlier_data.csv') %>% 
   rename(SNP = `Marker ID`) %>% 
   select(SNP, 
          `#Chromosome`,
@@ -285,7 +285,7 @@ outs = outs %>%
                 SNP, 
                 POS, 
                 FST, 
-                value)
+                value...7)
 
 neutral_range_snps = neutral_range_snps %>% 
   dplyr::select(-NMISS)
@@ -297,11 +297,50 @@ bind_rows(neutral_range_snps,
   write_tsv('SLGBPEL_MORPHO_Outliers_Colocalization_data.txt')
 
 
+bind_rows(neutral_range_snps, 
+          outs) %>% 
+  arrange(CHR, POS) %>% 
+  group_by(CHR)
+
 # Cal peak size -----------------------------------------------------------
 
 G_OVERLAP_df_list = list_of_dfs
 
 G_OVERLAP_df_list$`Affx-472339126`
+
+G_OVERLAP_df_list$`Affx-472339126` %>% 
+  summarise(last_pos = last(POS), 
+            first_pos = first(POS)) %>% 
+  mutate(peak_dist = last_pos - first_pos) %>% 
+  mutate(Mb_peak_dist = peak_dist/1000000)
+
+peak_cal = function(data){
+  data %>% 
+    summarise(last_pos = last(POS), 
+            first_pos = first(POS)) %>% 
+    mutate(peak_dist = last_pos - first_pos) %>% 
+    mutate(Mb_peak_dist = peak_dist/1000000)
+}
+
+lapply(G_OVERLAP_df_list, 
+       peak_cal)
+
+G_test = lapply(G_OVERLAP_df_list, 
+                function(x){summarise(last_pos = last(POS), 
+                            first_pos = first(POS)) %>% 
+                    mutate(peak_dist = last_pos - first_pos) %>% 
+                    mutate(Mb_peak_dist = peak_dist/1000000)
+                }) 
+  
+for (i in 1:length(G_OVERLAP_df_list)){
+   summarise(G_OVERLAP_df_list[[i]],
+             last_pos = last(POS), 
+             first_pos = first(POS))%>% 
+    mutate(peak_dist = last_pos - first_pos) %>% 
+    mutate(Mb_peak_dist = peak_dist/1000000) 
+}
+
+
 
 ##  
 # Sliding window ----------------------------------------------------------
