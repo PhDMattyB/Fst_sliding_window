@@ -44,6 +44,28 @@ outliers = read_csv('TSBPL_Outlier_data.csv') %>%
   arrange(SNP)
 
 
+# RDA outlier Fst comparison ----------------------------------------------
+RDA_outliers = inner_join(outliers, 
+                          data, 
+                          by = 'SNP')
+
+RDA_outliers %>% 
+  ggplot(aes(x = value, 
+             y = FST))+
+  geom_violin()
+
+RDA_outliers %>% 
+  group_by(value) %>% 
+  summarise(mean_trait = mean(FST))
+
+RDA_loci_diffs = aov(data = RDA_outliers, 
+                     FST ~ value)
+
+summary(RDA_loci_diffs)
+TukeyHSD(RDA_loci_diffs, 
+         conf.level = 0.99)
+plot(TukeyHSD(RDA_loci_diffs))
+
 # RDA outliers vs other loci ----------------------------------------------
 
 RDA_outliers = inner_join(outliers, 
