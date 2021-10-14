@@ -375,7 +375,7 @@ write_tsv(fst_position,
 
 # setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 
-data = read_tsv('GSBPI_Fst_200Kb_window.txt') %>% 
+data = read_tsv('VBRSIL_Fst_200Kb_window.txt') %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
     CHR == '2' ~ 'AC02',
@@ -454,11 +454,14 @@ data = Mb_Conversion(data)
 data = data %>% 
   filter(FST_n > 3) %>% 
   na.omit() %>% 
-  ungroup()
+  ungroup() %>% 
+  filter(CHR != 0)
 
 top5 = data[data$FST_mean > quantile(data$FST_mean, 
                                      prob = 1-5/100),]
 
+write_csv(top5, 
+         'VBRSIL_200Kb_Fst_outlier_23.07.2021.csv')
 ## need to combine the overlap and fst results for each popn
 top5_overlap = read_tsv('Fst_window_overlap_allBPpairs.txt')
 
@@ -482,6 +485,19 @@ data = data %>%
   filter(FST_n > 3) %>% 
   na.omit() %>% 
   ungroup()
+
+
+# Fst outlier comparison --------------------------------------------------
+
+GSBPI_outlier = read_csv('GSBPI_200Kb_Fst_outlier_23.07.2021.csv')
+SLGBPEL_outlier = read_csv('SLGBPEL_200Kb_Fst_outlier_23.07.2021.csv')
+TLGBPL_outlier = read_csv('TLGBPL_200Kb_Fst_outlier_23.07.2021.csv')
+TSBPL_outlier = read_csv('TSBPL_200Kb_Fst_outlier_23.07.2021.csv')
+VBRSIL_outlier = read_csv('VBRSIL_200Kb_Fst_outlier_23.07.2021.csv')
+
+inner_join(GSBPI_outlier, 
+           TSBPL_outlier, 
+           by = 'win_mid')
 
 ##
 # Fst bar graph neutral ---------------------------------------------------
