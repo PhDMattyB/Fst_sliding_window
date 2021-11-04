@@ -258,10 +258,10 @@ write_tsv(morpho_fst,
           'SLGBPEL_MORPHOoutliers_Fst.txt')
 
 ## read in the neutral data
-df_nonout = read_tsv('GSBPI_Neutral_snps.txt')
+df_nonout = read_tsv('TSBPL_Neutral_snps.txt')
 
 ##read in the outlier data
-# df_outliers = read_tsv('GSBPI_outliers_Fst.txt')
+# df_outliers = read_tsv('TSBPL_outliers_Fst.txt')
 
 overlap_outs = read_tsv('TSBPL_BOTHoutliers_Fst.txt') %>% 
   filter(CHR != 0)
@@ -358,16 +358,16 @@ neutral_range_snps = neutral_range_snps %>%
   dplyr::select(-NMISS)
 
 
-bind_rows(neutral_range_snps, 
-                   outs) %>% 
-  arrange(CHR, POS) %>% 
-  write_tsv('SLGBPEL_MORPHO_Outliers_Colocalization_data.txt')
+# bind_rows(neutral_range_snps, 
+#                    outs) %>% 
+#   arrange(CHR, POS) %>% 
+#   write_tsv('SLGBPEL_MORPHO_Outliers_Colocalization_data.txt')
 
 
-bind_rows(neutral_range_snps, 
-          outs) %>% 
-  arrange(CHR, POS) %>% 
-  group_by(CHR)
+# bind_rows(neutral_range_snps, 
+#           outs) %>% 
+#   arrange(CHR, POS) %>% 
+#   group_by(CHR)
 
 # Cal peak size -----------------------------------------------------------
 
@@ -375,19 +375,22 @@ bind_rows(neutral_range_snps,
 peak_cal = function(data){
   data %>% 
     summarise(last_pos = last(POS), 
-            first_pos = first(POS)) %>% 
+            first_pos = first(POS), 
+            avg_Fst = mean(FST)) %>% 
     mutate(peak_dist = last_pos - first_pos) %>% 
-    mutate(Mb_peak_dist = peak_dist/1000000)
+    mutate(Mb_peak_dist = peak_dist/1000000) 
 }
 
 peak_size = lapply(list_of_dfs, 
        peak_cal)
 
 peak_df = bind_rows(peak_size, 
-          .id = "column_label") %>% 
+          .id = "column_label") %>%
+  na.omit() %>% 
   summarise(mean_peak_dist = mean(peak_dist), 
             mean_peak_Mb = mean(Mb_peak_dist),
-            sd_peak_Mb = sd(Mb_peak_dist))
+            sd_peak_Mb = sd(Mb_peak_dist),
+            mean_Fst_peak = mean(avg_Fst))
 peak_df
 
 ##  
