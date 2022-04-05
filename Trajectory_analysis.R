@@ -184,6 +184,116 @@ qplot(PWS_PCA$x[,1],
         axis.title = element_text(size = 14), 
         axis.text = element_text(size = 12))
 
+## take the PC1 and PC2 scores from prcomp
+## then test the diffrences between the angles
+## then use the function parallel_analysis
+
+parallel_analysis(Bodyshape_PWS, 
+                  perm = 999, 
+                  fun = 'prcomp')
+
+PCA_identifiers = PWS_data_clean %>% 
+  dplyr::select(SpecimenID, 
+                Lake, 
+                Morph,
+                BP, 
+                LaMorph, 
+                Vector)
+PCA_coords = PWS_PCA$x %>% 
+  as_tibble() %>% 
+  dplyr::select(PC1, 
+                PC2)
+
+PCA_data = bind_cols(PCA_identifiers, 
+                     PCA_coords)
+
+
+# Test PCA angle differences ----------------------------------------------
+Coords_SPLIT_Vector = split(as.data.frame(PCA_coords), 
+                            list(PCA_data$Vector), 
+                            drop = T)
+Coords_Vector = lapply(Coords_SPLIT_Vector, 
+                       colMeans)
+
+GBP = Coords_Vector$GBP
+SBP = Coords_Vector$SBP
+TBP = Coords_Vector$TBP
+TBP2 = Coords_Vector$TBP2
+VBP = Coords_Vector$VBP
+
+## Test for differences in vector angles
+TestOfAngle(GBP, 
+            SBP, 
+            flip = F)
+
+TestOfAngle(GBP, 
+            TBP, 
+            flip = F)
+
+TestOfAngle(GBP, 
+            TBP2, 
+            flip = F)
+
+TestOfAngle(GBP, 
+            VBP, 
+            flip = F)
+
+TestOfAngle(SBP, 
+            TBP, 
+            flip = F)
+
+TestOfAngle(SBP, 
+            TBP2, 
+            flip = F)
+TestOfAngle(SBP, 
+            VBP, 
+            flip = F)
+
+TestOfAngle(TBP, 
+            TBP2, 
+            flip = F)
+
+TestOfAngle(TBP, 
+            VBP, 
+            flip = F)
+
+TestOfAngle(TBP2, 
+            VBP, 
+            flip = F)
+
+
+# Magnitude diffs PCA vectors ---------------------------------------------
+
+Mag_GBP_SBP = dist_mean_boot(A = Coords_SPLIT_Vector$GBP, 
+                             B = Coords_SPLIT_Vector$SBP)
+
+Mag_GBP_TBP = dist_mean_boot(A = Coords_SPLIT_Vector$GBP, 
+                             B = Coords_SPLIT_Vector$TBP)
+
+Mag_GBP_TBP2 = dist_mean_boot(A = Coords_SPLIT_Vector$GBP, 
+                              B = Coords_SPLIT_Vector$TBP2)
+
+Mag_GBP_VBP = dist_mean_boot(A = Coords_SPLIT_Vector$GBP, 
+                             B = Coords_SPLIT_Vector$VBP)
+
+Mag_SBP_TBP = dist_mean_boot(A = Coords_SPLIT_Vector$SBP, 
+                             B = Coords_SPLIT_Vector$TBP)
+
+Mag_SBP_TBP2 = dist_mean_boot(A = Coords_SPLIT_Vector$SBP, 
+                              B = Coords_SPLIT_Vector$TBP2)
+
+Mag_SBP_VBP = dist_mean_boot(A = Coords_SPLIT_Vector$SBP, 
+                             B = Coords_SPLIT_Vector$VBP)
+
+Mag_TBP_TBP2 = dist_mean_boot(A = Coords_SPLIT_Vector$TBP, 
+                              B = Coords_SPLIT_Vector$TBP2)
+
+Mag_TBP_VBP = dist_mean_boot(A = Coords_SPLIT_Vector$TBP, 
+                             B = Coords_SPLIT_Vector$VBP)
+
+Mag_TBP2_VBP = dist_mean_boot(A = Coords_SPLIT_Vector$TBP2, 
+                              B = Coords_SPLIT_Vector$VBP)
+
 
 # Test angle differences --------------------------------------------------
 
@@ -245,6 +355,9 @@ TestOfAngle(TBP2,
 TestOfAngle(GBP, 
             GBP, 
             flip = F)
+
+critical_angle(GBP, 
+               SBP)
 # Notice that the angle are often "significantly small" (i.e., the two trajectories/vectors are approximately the same)
 # Notice that the angle is the same as the one produced in the trajectory analysis above
 
