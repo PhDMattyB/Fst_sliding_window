@@ -166,12 +166,23 @@ library(Morpho)
 
 PWS_PCA = prcomp(Bodyshape_PWS)
 
+BP_cols = c('#1d3557',
+            '#e63946')
+
+
 qplot(PWS_PCA$x[,1], 
       PWS_PCA$x[,2], 
       col = rrpp$BP, 
       shape = rrpp$Vector, 
-      size = 4) +
-  coord_equal()
+      size = 3) +
+  coord_equal()+
+  scale_color_manual(values = BP_cols)+
+  labs(x = 'Principal component 1', 
+       y = 'Principal component 2')+
+  theme(panel.grid = element_blank(), 
+        legend.position = 'none', 
+        axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12))
 
 
 # Test angle differences --------------------------------------------------
