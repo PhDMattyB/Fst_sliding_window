@@ -183,6 +183,64 @@ Coords_SPLIT = split(as.data.frame(Bodyshape_PWS),
                      list(rrpp$BP, 
                           rrpp$Vector), 
                      drop = T)
-Coords = lapply(Coords_SPLIT, 
+Coords_SPLIT = split(as.data.frame(Bodyshape_PWS), 
+                     list(rrpp$Vector), 
+                     drop = T)
+Coords_group_mean = lapply(Coords_SPLIT, 
                 colMeans)
+
+
+
+GBP = Coords_group_mean$GBP
+SBP = Coords_group_mean$SBP
+TBP = Coords_group_mean$TBP
+TBP2 = Coords_group_mean$TBP2
+VBP = Coords_group_mean$VBP
+
+## Test for differences in vector angles
+TestOfAngle(GBP, 
+            SBP, 
+            flip = F)
+
+TestOfAngle(GBP, 
+            TBP, 
+            flip = F)
+
+TestOfAngle(GBP, 
+            TBP2, 
+            flip = F)
+
+TestOfAngle(GBP, 
+            VBP, 
+            flip = F)
+
+TestOfAngle(SBP, 
+            TBP, 
+            flip = F)
+
+TestOfAngle(SBP, 
+            TBP2, 
+            flip = F)
+TestOfAngle(SBP, 
+            VBP, 
+            flip = F)
+
+TestOfAngle(TBP, 
+            TBP2, 
+            flip = F)
+
+TestOfAngle(TBP, 
+            VBP, 
+            flip = F)
+
+TestOfAngle(TBP2, 
+            VBP, 
+            flip = F)
+
+TestOfAngle(GBP, 
+            GBP, 
+            flip = F)
+# Notice that the angle are often "significantly small" (i.e., the two trajectories/vectors are approximately the same)
+# Notice that the angle is the same as the one produced in the trajectory analysis above
+
 
