@@ -169,16 +169,29 @@ PWS_PCA = prcomp(Bodyshape_PWS)
 BP_cols = c('#1d3557',
             '#e63946')
 
+BP_shapes = c(1, 
+              16, 
+              0, 
+              15, 
+              2, 
+              17, 
+              5, 
+              18, 
+              6, 
+              25)
+summary(PWS_PCA)
 
-qplot(PWS_PCA$x[,1], 
+PWS_PCA$x
+PCA_BP_Vectors = qplot(PWS_PCA$x[,1], 
       PWS_PCA$x[,2], 
       col = rrpp$BP, 
       shape = rrpp$Vector, 
       size = 3) +
   coord_equal()+
   scale_color_manual(values = BP_cols)+
-  labs(x = 'Principal component 1', 
-       y = 'Principal component 2')+
+  scale_shape_manual(values = BP_shapes)+
+  labs(x = 'Benthic-pelagic trajectory 1', 
+       y = 'Benthic-pelagic trajectory 2')+
   theme(panel.grid = element_blank(), 
         legend.position = 'none', 
         axis.title = element_text(size = 14), 
@@ -188,9 +201,6 @@ qplot(PWS_PCA$x[,1],
 ## then test the diffrences between the angles
 ## then use the function parallel_analysis
 
-parallel_analysis(Bodyshape_PWS, 
-                  perm = 999, 
-                  fun = 'prcomp')
 
 PCA_identifiers = PWS_data_clean %>% 
   dplyr::select(SpecimenID, 
@@ -431,3 +441,21 @@ distance_alab_boot
 distance_blab_boot
 distance_clab_boot
 distance_dlab_boot
+
+
+
+
+# combine graphs ----------------------------------------------------------
+library(patchwork)
+PCA_BP_Vectors
+PCA_BodyShape
+
+Phenotype_analyses = PCA_BodyShape|PCA_BP_Vectors
+
+ggsave('Phenotype_trajectory_analysis.tiff',
+       plot = Phenotype_analyses, 
+       dpi = 'retina', 
+       unit = 'cm', 
+       width = 25, 
+       height = 20
+)
