@@ -27,29 +27,55 @@ Geno_indv = read_csv('GSTVMF_Morph_Eco_Geno.csv') %>%
 PWS_data_clean = inner_join(PWS_data, 
            Geno_indv, 
            by = 'SpecimenID') %>% 
-  filter(LaMorph.x != 'S.LGB2', 
-         LaMorph.x != 'T.PL2') %>% 
+  filter(LaMorph.x != 'S.LGB2') %>% 
   rename(Lake = Lake.x, 
          Morph = Morph.x, 
          BP = BP.x, 
          LaMorph = LaMorph.x, 
          Sex = Sex.x)
-View(PWS_data_clean)
+# View(PWS_data_clean)
+
+# PWS_data_clean = mutate(.data = PWS_data_clean,
+#                  BP2 = as.factor(case_when(
+#                    LaMorph == 'G.SB' ~ 'Benthic',
+#                    LaMorph == 'G.PI' ~ 'Pelagic',
+#                    LaMorph == 'S.LGB' ~ 'Benthic',
+#                    LaMorph == 'S.PL' ~ 'Pelagic',
+#                    LaMorph == 'S.PI' ~ 'Pelagic',
+#                    LaMorph == 'T.LGB' ~ 'Benthic',
+#                    LaMorph == 'T.SB' ~ 'Benthic2',
+#                    LaMorph == 'T.PL' ~ 'Pelagic',
+#                    LaMorph == 'V.BR' ~ 'Pelagic',
+#                    LaMorph == 'V.SIL' ~ 'Benthic')))
+
+
+# PWS_data_clean = mutate(.data = PWS_data_clean,
+#                         BP2 = as.factor(case_when(
+#                           LaMorph == 'G.SB' ~ 'G.Benthic',
+#                           LaMorph == 'G.PI' ~ 'G.Pelagic',
+#                           LaMorph == 'S.LGB' ~ 'S.Benthic',
+#                           LaMorph == 'S.PL' ~ 'S.Pelagic',
+#                           LaMorph == 'S.PI' ~ 'S.Pelagic',
+#                           LaMorph == 'T.LGB' ~ 'T.Benthic',
+#                           LaMorph == 'T.SB' ~ 'T.Benthic2',
+#                           LaMorph == 'T.PL' ~ 'T.Pelagic',
+#                           LaMorph == 'V.BR' ~ 'V.Pelagic',
+#                           LaMorph == 'V.SIL' ~ 'V.Benthic')))
 
 PWS_data_clean = mutate(.data = PWS_data_clean,
-                 BP2 = as.factor(case_when(
-                   LaMorph == 'G.SB' ~ 'Benthic',
-                   LaMorph == 'G.PI' ~ 'Pelagic',
-                   LaMorph == 'S.LGB' ~ 'Benthic',
-                   LaMorph == 'S.PL' ~ 'Pelagic',
-                   LaMorph == 'S.PI' ~ 'Pelagic',
-                   LaMorph == 'T.LGB' ~ 'Benthic',
-                   LaMorph == 'T.SB' ~ 'Benthic2',
-                   LaMorph == 'T.PL' ~ 'Pelagic',
-                   LaMorph == 'V.BR' ~ 'Pelagic',
-                   LaMorph == 'V.SIL' ~ 'Benthic')))
-
-
+                        Vector = as.factor(case_when(
+                          LaMorph == 'G.SB' ~ 'GBP',
+                          LaMorph == 'G.PI' ~ 'GBP',
+                          LaMorph == 'S.LGB' ~ 'SBP',
+                          LaMorph == 'S.PL' ~ 'SBP',
+                          LaMorph == 'S.PI' ~ 'SBP',
+                          LaMorph == 'T.LGB' ~ 'TBP',
+                          LaMorph == 'T.SB' ~ 'TBP2',
+                          LaMorph == 'T.PL' ~ 'TBP',
+                          LaMorph == 'T.PL2' ~ 'TBP2',
+                          LaMorph == 'V.BR' ~ 'VBP',
+                          LaMorph == 'V.SIL' ~ 'VBP')))
+# RRPP --------------------------------------------------------------------
 
 
 rrpp = rrpp.data.frame(PWS_data_clean)
@@ -95,13 +121,36 @@ Bodyshape_PWS = cbind(rrpp$PW19X,
                       rrpp$UNIX, 
                       rrpp$UNIY, 
                       rrpp$CS)
-BP_Morph_Pair = rrpp$BP2
+BP_Morph_Pair = rrpp$BP
+Vector = rrpp$Vector
 Lake = rrpp$Lake
 
-BP_test = lm.rrpp(Bodyshape_PWS ~ Lake * BP_Morph_Pair, 
+BP_test = lm.rrpp(Bodyshape_PWS ~ Lake*BP_Morph_Pair, 
                   data = rrpp, 
                   iter = 999)
 
 summary(BP_test)
 anova(BP_test)
+
+
+# Trajectory Analysis -----------------------------------------------------
+
+Traj_Analysis = trajectory.analysis(BP_test, 
+                                    groups = BP_Morph_Pair, 
+                                    traj.pts = Lake, 
+                                    print.progress = F)
+
+# Traj_Analysis = trajectory.analysis(BP_test, 
+#                                     groups = Vector, 
+#                                     traj.pts = Lake, 
+#                                     print.progress = F)
+
+
+summary(Traj_Analysis, 
+        attribute = 'MD') ## Magnitude of differences is significant
+summary(Traj_Analysis, 
+        attribute = 'TC', 
+        angle.type = 'deg') ## Differences in angles
+summary(Traj_Analysis, 
+        attribute = 'SD') ##Shape differences among trajectories
 
