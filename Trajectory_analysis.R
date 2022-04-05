@@ -193,7 +193,7 @@ PCA_BP_Vectors = qplot(PWS_PCA$x[,1],
   labs(x = 'Benthic-pelagic trajectory 1', 
        y = 'Benthic-pelagic trajectory 2')+
   theme(panel.grid = element_blank(), 
-        legend.position = 'none', 
+        # legend.position = 'none', 
         axis.title = element_text(size = 14), 
         axis.text = element_text(size = 12))
 
