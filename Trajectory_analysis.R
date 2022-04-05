@@ -34,6 +34,22 @@ PWS_data_clean = inner_join(PWS_data,
          BP = BP.x, 
          LaMorph = LaMorph.x, 
          Sex = Sex.x)
+View(PWS_data_clean)
+
+PWS_data_clean = mutate(.data = PWS_data_clean,
+                 BP2 = as.factor(case_when(
+                   LaMorph == 'G.SB' ~ 'Benthic',
+                   LaMorph == 'G.PI' ~ 'Pelagic',
+                   LaMorph == 'S.LGB' ~ 'Benthic',
+                   LaMorph == 'S.PL' ~ 'Pelagic',
+                   LaMorph == 'S.PI' ~ 'Pelagic',
+                   LaMorph == 'T.LGB' ~ 'Benthic',
+                   LaMorph == 'T.SB' ~ 'Benthic2',
+                   LaMorph == 'T.PL' ~ 'Pelagic',
+                   LaMorph == 'V.BR' ~ 'Pelagic',
+                   LaMorph == 'V.SIL' ~ 'Benthic')))
+
+
 
 
 rrpp = rrpp.data.frame(PWS_data_clean)
@@ -79,7 +95,13 @@ Bodyshape_PWS = cbind(rrpp$PW19X,
                       rrpp$UNIX, 
                       rrpp$UNIY, 
                       rrpp$CS)
-BP_Morph_Pair = rrpp$BP
+BP_Morph_Pair = rrpp$BP2
 Lake = rrpp$Lake
 
+BP_test = lm.rrpp(Bodyshape_PWS ~ Lake * BP_Morph_Pair, 
+                  data = rrpp, 
+                  iter = 999)
+
+summary(BP_test)
+anova(BP_test)
 
