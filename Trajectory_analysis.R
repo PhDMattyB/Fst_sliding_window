@@ -179,23 +179,23 @@ qplot(PCA_general$x[,1], PCA_general$x[,2],
   coord_equal()+theme_classic()
 
 
-Coords_SPLIT = split(as.data.frame(Bodyshape_PWS), 
-                     list(rrpp$BP, 
-                          rrpp$Vector), 
-                     drop = T)
-Coords_SPLIT = split(as.data.frame(Bodyshape_PWS), 
+
+# Test angle differences --------------------------------------------------
+
+
+Coords_SPLIT_Vector = split(as.data.frame(Bodyshape_PWS), 
                      list(rrpp$Vector), 
                      drop = T)
-Coords_group_mean = lapply(Coords_SPLIT, 
+Coords_Vector = lapply(Coords_SPLIT_Vector, 
                 colMeans)
 
 
 
-GBP = Coords_group_mean$GBP
-SBP = Coords_group_mean$SBP
-TBP = Coords_group_mean$TBP
-TBP2 = Coords_group_mean$TBP2
-VBP = Coords_group_mean$VBP
+GBP = Coords_Vector$GBP
+SBP = Coords_Vector$SBP
+TBP = Coords_Vector$TBP
+TBP2 = Coords_Vector$TBP2
+VBP = Coords_Vector$VBP
 
 ## Test for differences in vector angles
 TestOfAngle(GBP, 
@@ -243,4 +243,73 @@ TestOfAngle(GBP,
 # Notice that the angle are often "significantly small" (i.e., the two trajectories/vectors are approximately the same)
 # Notice that the angle is the same as the one produced in the trajectory analysis above
 
+# magnitude of difference between Vectors -----------------------------------------
 
+Mag_GBP_SBP = dist_mean_boot(A = Coords_SPLIT_Vector$GBP, 
+                             B = Coords_SPLIT_Vector$SBP)
+
+Mag_GBP_TBP = dist_mean_boot(A = Coords_SPLIT_Vector$GBP, 
+                             B = Coords_SPLIT_Vector$TBP)
+
+Mag_GBP_TBP2 = dist_mean_boot(A = Coords_SPLIT_Vector$GBP, 
+                             B = Coords_SPLIT_Vector$TBP2)
+
+Mag_GBP_VBP = dist_mean_boot(A = Coords_SPLIT_Vector$GBP, 
+                             B = Coords_SPLIT_Vector$VBP)
+
+Mag_SBP_TBP = dist_mean_boot(A = Coords_SPLIT_Vector$SBP, 
+                             B = Coords_SPLIT_Vector$TBP)
+
+Mag_SBP_TBP2 = dist_mean_boot(A = Coords_SPLIT_Vector$SBP, 
+                             B = Coords_SPLIT_Vector$TBP2)
+
+Mag_SBP_VBP = dist_mean_boot(A = Coords_SPLIT_Vector$SBP, 
+                             B = Coords_SPLIT_Vector$VBP)
+
+Mag_TBP_TBP2 = dist_mean_boot(A = Coords_SPLIT_Vector$TBP, 
+                             B = Coords_SPLIT_Vector$TBP2)
+
+Mag_TBP_VBP = dist_mean_boot(A = Coords_SPLIT_Vector$TBP, 
+                             B = Coords_SPLIT_Vector$VBP)
+
+Mag_TBP2_VBP = dist_mean_boot(A = Coords_SPLIT_Vector$TBP2, 
+                             B = Coords_SPLIT_Vector$VBP)
+
+# Magnitude of distance between BP morphs within populations --------------
+
+
+## Now "magnitude" of differences (distance between means) ###
+
+Coords_SPLIT = split(as.data.frame(Bodyshape_PWS), 
+                     list(rrpp$BP, 
+                          rrpp$Vector), 
+                     drop = T)
+Coords_group_mean = lapply(Coords_SPLIT, 
+                           colMeans)
+
+dist_gal_boot = dist_mean_boot(A = Coords_SPLIT$Benthic.GBP, 
+                               B = Coords_SPLIT$Pelagic.GBP)
+
+
+
+distance_a_boot=dist_mean_boot(A=Coords_SPLIT$a.warm, B=Coords_SPLIT$a.cold)
+distance_b_boot=dist_mean_boot(A=Coords_SPLIT$b.warm, B=Coords_SPLIT$b.cold)
+distance_c_boot=dist_mean_boot(A=Coords_SPLIT$c.warm, B=Coords_SPLIT$c.cold)
+distance_d_boot=dist_mean_boot(A=Coords_SPLIT$d.warm, B=Coords_SPLIT$d.cold)
+distance_e_boot=dist_mean_boot(A=Coords_SPLIT$e.warm, B=Coords_SPLIT$e.cold)
+distance_f_boot=dist_mean_boot(A=Coords_SPLIT$f.warm, B=Coords_SPLIT$f.cold)
+distance_alab_boot=dist_mean_boot(A=Coords_SPLIT$alab.warm, B=Coords_SPLIT$alab.cold)
+distance_blab_boot=dist_mean_boot(A=Coords_SPLIT$blab.warm, B=Coords_SPLIT$blab.cold)
+distance_clab_boot=dist_mean_boot(A=Coords_SPLIT$clab.warm, B=Coords_SPLIT$clab.cold)
+distance_dlab_boot=dist_mean_boot(A=Coords_SPLIT$dlab.warm, B=Coords_SPLIT$dlab.cold)
+#####results
+distance_a_boot
+distance_b_boot
+distance_c_boot
+distance_d_boot
+distance_e_boot
+distance_f_boot
+distance_alab_boot
+distance_blab_boot
+distance_clab_boot
+distance_dlab_boot
