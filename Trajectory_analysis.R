@@ -154,3 +154,35 @@ summary(Traj_Analysis,
 summary(Traj_Analysis, 
         attribute = 'SD') ##Shape differences among trajectories
 
+
+
+
+# Partial warps based trajectory analysis ---------------------------------
+
+library(remotes)
+install_github("fruciano/GeometricMorphometricsMix")
+library(GeometricMorphometricsMix)
+library(Morpho)
+
+PWS_PCA = prcomp(Bodyshape_PWS)
+
+qplot(PWS_PCA$x[,1], 
+      PWS_PCA$x[,2], 
+      col = rrpp$BP, 
+      shape = rrpp$Vector, 
+      size = 4) +
+  coord_equal()
+
+
+qplot(PCA_general$x[,1], PCA_general$x[,2], 
+      col=allfishPW$pair, shape=allfishPW$temp, size=4)+
+  coord_equal()+theme_classic()
+
+
+Coords_SPLIT = split(as.data.frame(Bodyshape_PWS), 
+                     list(rrpp$BP, 
+                          rrpp$Vector), 
+                     drop = T)
+Coords = lapply(Coords_SPLIT, 
+                colMeans)
+
