@@ -174,12 +174,6 @@ qplot(PWS_PCA$x[,1],
   coord_equal()
 
 
-qplot(PCA_general$x[,1], PCA_general$x[,2], 
-      col=allfishPW$pair, shape=allfishPW$temp, size=4)+
-  coord_equal()+theme_classic()
-
-
-
 # Test angle differences --------------------------------------------------
 
 
