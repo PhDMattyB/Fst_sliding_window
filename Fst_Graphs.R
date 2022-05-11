@@ -9,6 +9,7 @@
 
 library(patchwork)
 library(tidyverse)
+theme_set(theme_bw())
 
 AC04q.1_29_split = function(data){
   AC04q.1_29 = data %>% 
@@ -36,6 +37,9 @@ setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 
 
 # Both_outlier = read_csv('TSBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>%
+
+
+# Import data -------------------------------------------------------------
 
 Both_outlier = read_csv('SLGBPEL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>% 
