@@ -160,7 +160,7 @@ summary(Traj_Analysis,
 # Partial warps based trajectory analysis ---------------------------------
 
 library(remotes)
-install_github("fruciano/GeometricMorphometricsMix")
+# install_github("fruciano/GeometricMorphometricsMix")
 library(GeometricMorphometricsMix)
 library(Morpho)
 
@@ -182,18 +182,30 @@ BP_shapes = c(1,
 summary(PWS_PCA)
 
 PWS_PCA$x
+
+simple_shapes = c(16, 17)
+colours = c('#467BB3', 
+            '#FF1E0C', 
+            '#108565',
+            '#2a9d8f',
+            '#D1BA0A')
+theme_set(theme_bw())
 PCA_BP_Vectors = qplot(PWS_PCA$x[,1], 
       PWS_PCA$x[,2], 
-      col = rrpp$BP, 
-      shape = rrpp$Vector, 
+      # col = rrpp$BP, 
+      col = rrpp$Vector,
+      # shape = rrpp$Vector, 
+      shape = rrpp$BP,
       size = 3) +
   coord_equal()+
-  scale_color_manual(values = BP_cols)+
-  scale_shape_manual(values = BP_shapes)+
+  # scale_color_manual(values = colours)+
+  # scale_shape_manual(values = BP_shapes)+
+  scale_color_manual(values = colours)+
+  scale_shape_manual(values = simple_shapes)+
   labs(x = 'Benthic-pelagic trajectory 1', 
        y = 'Benthic-pelagic trajectory 2')+
   theme(panel.grid = element_blank(), 
-        # legend.position = 'none', 
+        legend.position = 'none',
         axis.title = element_text(size = 14), 
         axis.text = element_text(size = 12))
 
@@ -452,7 +464,7 @@ PCA_BodyShape
 
 Phenotype_analyses = PCA_BodyShape|PCA_BP_Vectors
 
-ggsave('Phenotype_trajectory_analysis.tiff',
+ggsave('Phenotype_trajectory_analysis_FINAL.tiff',
        plot = Phenotype_analyses, 
        dpi = 'retina', 
        unit = 'cm', 
