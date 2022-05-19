@@ -166,19 +166,19 @@ library(Morpho)
 
 PWS_PCA = prcomp(Bodyshape_PWS)
 
-BP_cols = c('#1d3557',
-            '#e63946')
-
-BP_shapes = c(1, 
-              16, 
-              0, 
-              15, 
-              2, 
-              17, 
-              5, 
-              18, 
-              6, 
-              25)
+# BP_cols = c('#1d3557',
+#             '#e63946')
+# 
+# BP_shapes = c(1, 
+#               16, 
+#               0, 
+#               15, 
+#               2, 
+#               17, 
+#               5, 
+#               18, 
+#               6, 
+#               25)
 summary(PWS_PCA)
 
 PWS_PCA$x
@@ -226,6 +226,9 @@ PCA_coords = PWS_PCA$x %>%
   dplyr::select(PC1, 
                 PC2)
 
+# PCA_coords_multi = PWS_PCA$x %>% 
+#   as_tibble()
+
 PCA_data = bind_cols(PCA_identifiers, 
                      PCA_coords)
 
@@ -236,6 +239,12 @@ Coords_SPLIT_Vector = split(as.data.frame(PCA_coords),
                             drop = T)
 Coords_Vector = lapply(Coords_SPLIT_Vector, 
                        colMeans)
+
+# Coords_SPLIT_Vector = split(as.data.frame(PCA_coords_multi), 
+#                             list(PCA_data$Vector), 
+#                             drop = T)
+# Coords_Vector = lapply(Coords_SPLIT_Vector, 
+#                        colMeans)
 
 GBP = Coords_Vector$GBP
 SBP = Coords_Vector$SBP
