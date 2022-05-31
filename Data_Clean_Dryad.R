@@ -29,3 +29,6 @@ RDA_outliers_clean = bind_rows(GSBPI,
 ##test
 RDA_outliers_clean %>% 
   filter(BP_Morph_Pair == 'Thingvallavatn_BP1')
+
+RDA_outliers_clean %>% 
+  write_csv('RDA_Outliers_All_Pops_Combined.csv')
