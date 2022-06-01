@@ -40,8 +40,6 @@ TSBPL_data = read_tsv('TSBPL_fst.fst')%>%
 VBRSIL_data = read_tsv('VBRSIL_fst.fst')%>% 
   group_by(CHR)%>% 
   filter(CHR != 0)
-# data = read_tsv('SLGBPL_fst.fst')
-# data = read_tsv('SLGBPI_fst.fst')
 SLGBPEL_data = read_tsv('SLGBPEL_fst.fst')%>% 
   group_by(CHR)%>% 
   filter(CHR != 0)
@@ -60,53 +58,53 @@ TSBPL_top5 = TSBPL_data[TSBPL_data$FST > quantile(TSBPL_data$FST,
 VBRSIL_top5 = VBRSIL_data[VBRSIL_data$FST > quantile(VBRSIL_data$FST, 
                                                   prob = 1-5/100),]
 
-intersect(GSBPI_top5$SNP, 
-          SLGBPEL_top5$SNP) %>% 
-  as_tibble()
-intersect(GSBPI_top5$SNP, 
-          TLGBPL_top5$SNP) %>% 
-  as_tibble()
-intersect(GSBPI_top5$SNP, 
-          TSBPL_top5$SNP) %>% 
-  as_tibble()
-intersect(GSBPI_top5$SNP, 
-          VBRSIL_top5$SNP) %>% 
-  as_tibble()
-
-intersect(SLGBPEL_top5$SNP, 
-          TLGBPL_top5$SNP) %>% 
-  as_tibble()
-intersect(SLGBPEL_top5$SNP, 
-          TSBPL_top5$SNP) %>% 
-  as_tibble()
-intersect(SLGBPEL_top5$SNP, 
-          VBRSIL_top5$SNP) %>% 
-  as_tibble()
-
-intersect(TLGBPL_top5$SNP, 
-          TSBPL_top5$SNP) %>% 
-  as_tibble()
-
-intersect(TLGBPL_top5$SNP, 
-          VBRSIL_top5$SNP) %>% 
-  as_tibble()
-intersect(TSBPL_top5$SNP, 
-          VBRSIL_top5$SNP) %>% 
-  as_tibble()
-
-
-parallel = inner_join(GSBPI_top5, 
-                      SLGBPEL_top5, 
-                      by = 'SNP')
-parallel = inner_join(parallel, 
-                      TLGBPL_top5, 
-                      by = 'SNP')
-parallel = inner_join(parallel, 
-                      TSBPL_top5, 
-                      by = 'SNP')
-parallel = inner_join(parallel, 
-                      VBRSIL_top5, 
-                      by = 'SNP')
+# intersect(GSBPI_top5$SNP, 
+#           SLGBPEL_top5$SNP) %>% 
+#   as_tibble()
+# intersect(GSBPI_top5$SNP, 
+#           TLGBPL_top5$SNP) %>% 
+#   as_tibble()
+# intersect(GSBPI_top5$SNP, 
+#           TSBPL_top5$SNP) %>% 
+#   as_tibble()
+# intersect(GSBPI_top5$SNP, 
+#           VBRSIL_top5$SNP) %>% 
+#   as_tibble()
+# 
+# intersect(SLGBPEL_top5$SNP, 
+#           TLGBPL_top5$SNP) %>% 
+#   as_tibble()
+# intersect(SLGBPEL_top5$SNP, 
+#           TSBPL_top5$SNP) %>% 
+#   as_tibble()
+# intersect(SLGBPEL_top5$SNP, 
+#           VBRSIL_top5$SNP) %>% 
+#   as_tibble()
+# 
+# intersect(TLGBPL_top5$SNP, 
+#           TSBPL_top5$SNP) %>% 
+#   as_tibble()
+# 
+# intersect(TLGBPL_top5$SNP, 
+#           VBRSIL_top5$SNP) %>% 
+#   as_tibble()
+# intersect(TSBPL_top5$SNP, 
+#           VBRSIL_top5$SNP) %>% 
+#   as_tibble()
+# 
+# 
+# parallel = inner_join(GSBPI_top5, 
+#                       SLGBPEL_top5, 
+#                       by = 'SNP')
+# parallel = inner_join(parallel, 
+#                       TLGBPL_top5, 
+#                       by = 'SNP')
+# parallel = inner_join(parallel, 
+#                       TSBPL_top5, 
+#                       by = 'SNP')
+# parallel = inner_join(parallel, 
+#                       VBRSIL_top5, 
+#                       by = 'SNP')
 
 theme_set(theme_bw())
 GSBPI_Outlier_Dist = ggplot(data = GSBPI_top5, 

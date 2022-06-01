@@ -63,3 +63,24 @@ Fst_data_clean %>%
 Fst_data_clean %>% 
   write_csv('FST_data_All_Pops_Combined.csv')
 
+
+# Model lhoods clean ------------------------------------------------------
+
+setwd('~/PhD_Genomics_Chapter3/MolEcol_Submission3/Dryad_data/Fsc26/')
+
+gal = read_tsv('Galtabol_model_lhoods.txt') %>% 
+  mutate(Population = 'Galtabol')
+svin = read_tsv('Svinavatn_model_lhoods.txt') %>% 
+  mutate(Population = 'Svinavatn')
+thing = read_tsv('Thingvallavatn_model_lhoods.txt') %>% 
+  mutate(Population = 'Thingvallavatn')
+vatn = read_tsv('Vatnshlidarvatn_model_lhoods.txt') %>% 
+  mutate(Population = 'Vatnshlidarvatn')
+
+model_lhoods = bind_rows(gal, 
+                         svin, 
+                         thing, 
+                         vatn)
+
+model_lhoods %>% 
+  write_csv('Fsc26_Model_lhoods.csv')
