@@ -13,22 +13,27 @@ library(patchwork)
 library(tidyverse)
 
 # setwd('~/Fst_sliding_window')
-setwd('~/Fst_sliding_window/Galtabol_fst/')
-setwd('~/Fst_sliding_window/TLGBPL/')
-setwd('~/Fst_sliding_window/TSBPL/')
-setwd('~/Fst_sliding_window/VBRSIL/')
-setwd('~/Fst_sliding_window/SLGBPL/')
-setwd('~/Fst_sliding_window/SLGBPI/')
-setwd('~/Fst_sliding_window/')
+# setwd('~/Fst_sliding_window/Galtabol_fst/')
+# setwd('~/Fst_sliding_window/TLGBPL/')
+# setwd('~/Fst_sliding_window/TSBPL/')
+# setwd('~/Fst_sliding_window/VBRSIL/')
+# setwd('~/Fst_sliding_window/SLGBPL/')
+# setwd('~/Fst_sliding_window/SLGBPI/')
+# setwd('~/Fst_sliding_window/')
 
 setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
 
 # Data manipulation -------------------------------------------------------
-data = read_tsv('GSBPI_fst.fst')
+data = read_tsv('Galtabol_chr_fix.fst')
+data = read_tsv('SLGBPEL_fst.fst')
+data = read_tsv('TLGBPL_fst.fst')
+data = read_tsv('TSBPL_fst.fst')
 
-data = read_tsv('Galtabol_fst_NA.fst')
 
-outliers = read_csv('GSBPI_Outlier_data2.csv') %>% 
+data %>% 
+  group_by(CHR)
+
+outliers = read_csv('TSBPL_Outlier_data.csv') %>% 
   rename(SNP = `Marker ID`) %>% 
   select(SNP, 
          `#Chromosome`,
@@ -37,6 +42,77 @@ outliers = read_csv('GSBPI_Outlier_data2.csv') %>%
          CHROME3, 
          value) %>% 
   arrange(SNP)
+
+
+# RDA outlier Fst comparison ----------------------------------------------
+RDA_outliers = inner_join(outliers, 
+                          data, 
+                          by = 'SNP')
+
+RDA_outliers %>% 
+  ggplot(aes(x = value, 
+             y = FST))+
+  geom_violin()
+
+RDA_outliers %>% 
+  group_by(value) %>% 
+  summarise(mean_trait = mean(FST))
+
+RDA_loci_diffs = aov(data = RDA_outliers, 
+                     FST ~ value)
+
+summary(RDA_loci_diffs)
+TukeyHSD(RDA_loci_diffs, 
+         conf.level = 0.99)
+plot(TukeyHSD(RDA_loci_diffs))
+
+# RDA outliers vs other loci ----------------------------------------------
+
+RDA_outliers = inner_join(outliers, 
+           data, 
+           by = 'SNP')
+RDA_label = rep('RDA_outlier', 
+                nrow(RDA_outliers)) %>% 
+  as_tibble()
+RDA_outliers = bind_cols(RDA_outliers, 
+                         RDA_label)%>% 
+  select(CHR, 
+         SNP, 
+         POS, 
+         NMISS, 
+         FST, 
+         value...11) %>% 
+  rename(value = value...11)
+
+Neutral_snps = anti_join(data, 
+          outliers, 
+          by = 'SNP')
+neutral_label = rep('Neutral', 
+                    nrow(Neutral_snps)) %>% 
+  as_tibble()
+
+Neutral_snps = bind_cols(Neutral_snps, 
+                         neutral_label)
+
+ultimate_data = bind_rows(RDA_outliers, 
+                          Neutral_snps)
+
+ultimate_data %>% 
+  ggplot(aes(x = value, 
+             y = FST))+
+  geom_violin()
+
+ultimate_data %>% 
+  group_by(value) %>% 
+  summarise(mean_FST = mean(FST))
+
+aov_test = aov(data = ultimate_data, 
+               FST ~ value)
+summary(aov_test)
+
+##
+# Old shit we don't need anymore ------------------------------------------
+
 
 # poly_outliers = read_csv('Polypop_Outlier_data.csv')%>% 
 #   rename(SNP = `Marker ID`) %>% 
@@ -87,8 +163,6 @@ outliers = read_csv('GSBPI_Outlier_data2.csv') %>%
 #                          by = 'SNP')
 # ####
 
-
-
 not_outliers = anti_join(data,
                          outliers,
                          by = 'SNP')
@@ -101,7 +175,7 @@ not_outliers = bind_cols(not_outliers,
                          grouping)
 
 write_tsv(not_outliers,
-          'GSBPI_Neutral_snps.txt', col_names = TRUE)
+          'SLGBPEL_Neutral_snps.txt', col_names = TRUE)
 
 # outliers$value
 overlap_outliers = outliers %>% 
@@ -148,23 +222,23 @@ morpho_fst = left_join(morpho_trait,
 #          FST) %>% 
 #   distinct()
 
-grouping = rep('Both Outliers', 
-               length(BothTraits_Fst$FST)) %>% 
-  as_tibble()
-
-BothTraits_Fst = bind_cols(BothTraits_Fst, 
-                           grouping)
-grouping = rep('Iso outlier', 
-               length(Iso_fst$FST)) %>% 
-  as_tibble()
-Iso_fst = bind_cols(Iso_fst, 
-                    grouping)
-
-grouping = rep('Morpho outlier', 
-               length(morpho_fst$FST)) %>% 
-  as_tibble()
-morpho_fst = bind_cols(morpho_fst, 
-                       grouping)
+# grouping = rep('Both Outliers', 
+#                length(BothTraits_Fst$FST)) %>% 
+#   as_tibble()
+# 
+# BothTraits_Fst = bind_cols(BothTraits_Fst, 
+#                            grouping)
+# grouping = rep('Iso outlier', 
+#                length(Iso_fst$FST)) %>% 
+#   as_tibble()
+# Iso_fst = bind_cols(Iso_fst, 
+#                     grouping)
+# 
+# grouping = rep('Morpho outlier', 
+#                length(morpho_fst$FST)) %>% 
+#   as_tibble()
+# morpho_fst = bind_cols(morpho_fst, 
+#                        grouping)
 # 
 # grouping = rep('Outlier',
 #                length(Fst_outliers$FST)) %>% 
@@ -175,25 +249,25 @@ morpho_fst = bind_cols(morpho_fst,
 
 ## write the three files as csvs
 write_tsv(BothTraits_Fst, 
-          'GSBPI_BOTHoutliers_Fst.txt')
+          'SLGBPEL_BOTHoutliers_Fst.txt')
 
 write_tsv(Iso_fst, 
-          'GSBPI_ISOoutliers_Fst.txt')
+          'SLGBPEL_ISOoutliers_Fst.txt')
 
 write_tsv(morpho_fst, 
-          'GSBPI_MORPHOoutliers_Fst.txt')
+          'SLGBPEL_MORPHOoutliers_Fst.txt')
 
 ## read in the neutral data
-df_nonout = read_tsv('GSBPI_Neutral_snps.txt')
+df_nonout = read_tsv('TSBPL_Neutral_snps.txt')
 
 ##read in the outlier data
-# df_outliers = read_tsv('GSBPI_outliers_Fst.txt')
+# df_outliers = read_tsv('TSBPL_outliers_Fst.txt')
 
-overlap_outs = read_tsv('GSBPI_BOTHoutliers_Fst.txt') %>% 
+overlap_outs = read_tsv('TSBPL_BOTHoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-iso_outs = read_tsv('GSBPI_ISOoutliers_Fst.txt') %>% 
+iso_outs = read_tsv('TSBPL_ISOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
-morpho_outs = read_tsv('GSBPI_MORPHOoutliers_Fst.txt') %>% 
+morpho_outs = read_tsv('TSBPL_MORPHOoutliers_Fst.txt') %>% 
   filter(CHR != 0)
 
 range_cal = function(data){
@@ -210,6 +284,7 @@ overlap_outs = range_cal(overlap_outs)
 iso_outs = range_cal(iso_outs)
 morpho_outs = range_cal(morpho_outs)
 
+
 # df_outliers = range_cal(df_outliers)
 # View(df_outliers)
 ## CAM came in clutch and showed us how to automate this  
@@ -223,6 +298,9 @@ morpho_outs = range_cal(morpho_outs)
 list_of_dfs = list()
 
 df_outliers = overlap_outs
+df_outliers = iso_outs
+df_outliers = morpho_outs
+
 
 for(i in 1:nrow(df_outliers)){
   
@@ -257,10 +335,6 @@ for(i in 1:nrow(df_outliers)){
 length(list_of_dfs) == nrow(df_outliers)
 names(list_of_dfs) == df_outliers[['SNP']]
 #look at it to understand the structure
-list_of_dfs
-names(list_of_dfs) #outlier IDS
-list_of_dfs[1]	#df with outlier label
-list_of_dfs[[1]]#just the df
 
 
 
@@ -273,16 +347,61 @@ neutral_range_snps = bind_rows(list_of_dfs, .id = "column_label") %>%
 outs = df_outliers %>% 
   select(-low, -high)
 
-bind_rows(neutral_range_snps, 
-                   outs) %>% 
-  arrange(CHR, POS) %>% 
-  write_tsv('GSBPI_BOTHOutliers_Colocalization_data.txt')
+outs = outs %>% 
+  dplyr::select(CHR, 
+                SNP, 
+                POS, 
+                FST, 
+                value...7)
+
+neutral_range_snps = neutral_range_snps %>% 
+  dplyr::select(-NMISS)
+
+
+# bind_rows(neutral_range_snps, 
+#                    outs) %>% 
+#   arrange(CHR, POS) %>% 
+#   write_tsv('SLGBPEL_MORPHO_Outliers_Colocalization_data.txt')
+
+
+# bind_rows(neutral_range_snps, 
+#           outs) %>% 
+#   arrange(CHR, POS) %>% 
+#   group_by(CHR)
+
+# Cal peak size -----------------------------------------------------------
+
+
+peak_cal = function(data){
+  data %>% 
+    summarise(last_pos = last(POS), 
+            first_pos = first(POS), 
+            avg_Fst = mean(FST)) %>% 
+    mutate(peak_dist = last_pos - first_pos) %>% 
+    mutate(Mb_peak_dist = peak_dist/1000000) 
+}
+
+peak_size = lapply(list_of_dfs, 
+       peak_cal)
+
+peak_df = bind_rows(peak_size, 
+          .id = "column_label") %>%
+  na.omit() %>% 
+  summarise(mean_peak_dist = mean(peak_dist), 
+            mean_peak_Mb = mean(Mb_peak_dist),
+            sd_peak_Mb = sd(Mb_peak_dist),
+            mean_Fst_peak = mean(avg_Fst))
+peak_df
 
 ##  
 # Sliding window ----------------------------------------------------------
-Both = read_tsv('GSBPI_BOTHOutliers_Colocalization_data.txt')
-iso = read_tsv('GSBPI_ISOOutliers_Colocalization_data.txt')
-morpho = read_tsv('GSBPI_MORPHOOutliers_Colocalization_data.txt')
+# Both = read_tsv('GSBPI_BOTHOutliers_Colocalization_data.txt')
+# iso = read_tsv('GSBPI_ISOOutliers_Colocalization_data.txt')
+# morpho = read_tsv('GSBPI_MORPHOOutliers_Colocalization_data.txt')
+
+Both = read_tsv('SLGBPEL_BOTH_Outliers_Colocalization_data.txt')
+iso = read_tsv('SLGBPEL_ISO_Outliers_Colocalization_data.txt')
+morpho = read_tsv('SLGBPEL_MORPHO_Outliers_Colocalization_data.txt')
 
 
 fst_window = winScan(x = morpho,
@@ -297,10 +416,9 @@ fst_window = winScan(x = morpho,
 fst_window %>%
   as_tibble() %>%
   filter(FST_n >3) %>%
-  write_csv('GSBPI_MORPHO_Colocalization_Fst_Outliers_200Kb.csv',
+  write_csv('SLGBPEL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv',
             col_names = T)
 
-read_csv('TSBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv') 
 
 # fst_window_flag = winScan(x = Both,
 #                      groups = c('CHR', 'value'),
@@ -321,19 +439,171 @@ read_csv('TSBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv')
 #   filter(value == 'Overlapping locus')
 
 
+# Fst peaks and data filter -----------------------------------------------
+
+## Read in the data for the outliers
+TLGBPL_iso = read_tsv('TLGBPL_ISO_Outliers_Colocalization_data.txt')
+TLGBPL_morpho = read_tsv('TLGBPL_MORPHO_Outliers_Colocalization_data.txt')
+TLGBPL_both = read_tsv('TLGBPL_BOTH_Outliers_Colocalization_data.txt')
+
+## make labels for each group of snps
+iso_outlier = TLGBPL_iso %>% 
+  # filter(value == 'Isotope locus')
+  filter(value == 'Non-Outlier')
+
+# label = rep('Outlier', 
+#             length(iso_outlier$value)) %>% 
+#   as_tibble() %>% 
+#   rename(label = value)
+label = rep('Near Outlier',
+            length(iso_outlier$value)) %>%
+  as_tibble() %>%
+  rename(label = value)
+iso_outlier = bind_cols(iso_outlier, 
+                        label)
+
+
+morpho_outlier = TLGBPL_morpho %>% 
+  # filter(value == 'Morphological locus')
+  filter(value == 'Non-Outlier')
+label = rep('Near Outlier', 
+            length(morpho_outlier$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+morpho_outlier = bind_cols(morpho_outlier, 
+                        label)
+
+both_outlier = TLGBPL_both %>% 
+  # filter(value == 'Overlapping locus')
+  filter(value == 'Non-Outlier')
+label = rep('Near Outlier', 
+            length(both_outlier$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+both_outlier = bind_cols(both_outlier, 
+                        label)
+## write the csv for each population
+bind_rows(iso_outlier, 
+          morpho_outlier, 
+          both_outlier) %>% 
+  write_csv('TLGBPL_Near_Outlier_data_21.04.2021.csv')
+
+## Need to read in data and create a population column
+# GSBPI = read_csv('GSBPI_Outlier_Colocalization_data_21.04.2021.csv')
+GSBPI = read_csv('GSBPI_Near_Outlier_data_21.04.2021.csv')
+
+population = rep('GSBPI', length(GSBPI$label)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+GSBPI = bind_cols(GSBPI, 
+                  population)
+
+# SLGBPEL = read_csv('SLGBPEL_Outlier_Colocalization_data_21.04.2021.csv')
+SLGBPEL = read_csv('SLGBPEL_Near_Outlier_data_21.04.2021.csv')
+population = rep('SLGBPEL', length(SLGBPEL$label)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+SLGBPEL = bind_cols(SLGBPEL, 
+                  population)
+
+# TLGBPL = read_csv('TLGBPL_Outlier_Colocalization_data_21.04.2021.csv')
+TLGBPL = read_csv('TLGBPL_Near_Outlier_data_21.04.2021.csv')
+population = rep('TLGBPL', length(TLGBPL$label)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+TLGBPL = bind_cols(TLGBPL, 
+                  population)
+
+# TSBPL = read_csv('TSBPL_Outlier_Colocalization_data_21.04.2021.csv')
+TSBPL = read_csv('TSBPL_Near_Outlier_data_21.04.2021.csv')
+population = rep('TSBPL', length(TSBPL$label)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+TSBPL = bind_cols(TSBPL, 
+                  population)
+## write the csv
+bind_rows(GSBPI, 
+          SLGBPEL, 
+          TLGBPL, 
+          TSBPL) %>% 
+  write_csv('AllPops_Near_Outlier_data.21.04.2021.csv')
+
+
+## Need to find the neutral snps
+
+GSBPI_neutral = read_tsv('GSBPI_Neutral_snps.txt')
+label = rep('Neutral',
+            length(GSBPI_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+population = rep('GSBPI', 
+                 length(GSBPI_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+
+GSBPI_neutral = bind_cols(GSBPI_neutral, 
+          label, 
+          population)
+
+
+SLGBPEL_neutral = read_tsv('SLGBPEL_Neutral_snps.txt')
+label = rep('Neutral',
+            length(SLGBPEL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+population = rep('SLGBPEL', 
+                 length(SLGBPEL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+SLGBPEL_neutral = bind_cols(SLGBPEL_neutral, 
+                          label, 
+                          population)
+
+TLGBPL_neutral = read_tsv('TLGBPL_Neutral_snps.txt')
+label = rep('Neutral',
+            length(TLGBPL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+population = rep('TLGBPL', 
+                 length(TLGBPL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+TLGBPL_neutral = bind_cols(TLGBPL_neutral, 
+                            label, 
+                            population)
+
+TSBPL_neutral = read_tsv('TSBPL_Neutral_snps.txt')
+label = rep('Neutral',
+            length(TSBPL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+population = rep('TSBPL', 
+                 length(TSBPL_neutral$value)) %>% 
+  as_tibble() %>% 
+  rename(Population = value)
+TSBPL_neutral = bind_cols(TSBPL_neutral, 
+                            label, 
+                            population)
+
+bind_rows(GSBPI_neutral, 
+          SLGBPEL_neutral, 
+          TLGBPL_neutral, 
+          TSBPL_neutral) %>% 
+  write_csv('Allpops_neutral_snps_21.4.2021.csv')
 
 # Shared and non-shared regions -------------------------------------------
 # read_csv('GSBPI_Fst_Outliers_Combined_200Kb.csv')
 # read_csv('GSBPI_Fst_Outliers_Combined_200Kb.csv')
 
-GSBPI = read_csv('GSBPI_Colocalization_Fst_Outliers_200Kb.csv') 
+GSBPI = read_csv('GSBPI_Fst_200kb_outliers_19.04.2021.csv') 
   # filter(value == 'Outlier', 
   #        FST_n > 0) %>%
   # filter(row_number() %% 101 == 1) %>% 
   # filter(row_number() %% 2 == 1)
 
-SLGBPL = read_csv('SLGBPL_Colocalization_Fst_Outliers_200Kb.csv') %>% 
-  filter(value == 'Outlier', 
+# SLGBPL = read_csv('SLGBPL_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+SLGBPEL  
+filter(value == 'Outlier', 
          FST_n > 0) %>%
   filter(row_number() %% 101 == 1) %>% 
   filter(row_number() %% 2 == 1)
@@ -480,7 +750,7 @@ plot_fst
 ggsave(plot = last_plot(), 
        'VBRSIL_Outlier_Fst_peaks_colocalization.tiff')
 # Colocalization table and bar chart ------------------------------------------------
-setwd('~/Fst_sliding_window')
+# setwd('~/Fst_sliding_window')
 
 GSBPI_out = read_tsv('GSBPI_Colocalization_data.txt')
 value = rep('GSBPI', length(GSBPI_out$SNP)) %>% 
@@ -764,3 +1034,139 @@ pairwise.t.test(data$FST,
                 data$value,
                 p.adjust.method = 'bonferroni')
 
+
+
+
+# Differentiation peak range cal ------------------------------------------
+
+# Galtabol peak sizes -----------------------------------------------------
+
+G_Both = read_tsv('GSBPI_BOTHOutliers_Colocalization_data.txt')
+G_iso = read_tsv('GSBPI_ISOOutliers_Colocalization_data.txt')
+G_morpho = read_tsv('GSBPI_MORPHOOutliers_Colocalization_data.txt')
+
+View(G_Both)
+
+G_peak1 = G_Both %>% 
+  slice(1:9)
+G_peak1_size = (G_peak1[9,3]-G_peak1[1,3])/1000000
+
+G_peak2 = G_Both %>% 
+  slice(10:13)
+G_peak2_size = (G_peak2[4,3]-G_peak1[1,3])/1000000
+
+G_peak3 = G_Both %>% 
+  slice(14:18)
+G_peak3_size = (G_peak3[5,3]-G_peak3[1,3])/1000000
+
+G_peak4 = G_Both %>% 
+  slice(19:20)
+G_peak4_size = (G_peak4[2,3]-G_peak4[1,3])/1000000
+
+G_peak5 = G_Both %>% 
+  slice(21:26)
+G_peak5_size = (G_peak5[6,3]-G_peak5[1,3])/1000000
+
+G_peak6 = G_Both %>% 
+  slice(28:29)
+G_peak6_size = (G_peak6[2,3]-G_peak6[1,3])/1000000
+
+G_peak7 = G_Both %>% 
+  slice(30:40)
+G_peak7_size = (G_peak7[11,3]-G_peak7[1,3])/1000000
+
+G_peak8 = G_Both %>% 
+  slice(41:44)
+G_peak8_size = (G_peak8[4,3]-G_peak8[1,3])/1000000
+
+G_peak9 = G_Both %>% 
+  slice(45:49)
+G_peak9_size = (G_peak9[5,3]-G_peak9[1,3])/1000000
+
+G_peak10 = G_Both %>% 
+  slice(50:53)
+G_peak10_size = (G_peak10[4,3]-G_peak10[1,3])/1000000
+
+G_peak11 = G_Both %>% 
+  slice(54:56)
+G_peak11_size = (G_peak11[3,3]-G_peak11[1,3])/1000000
+
+G_peak12 = G_Both %>% 
+  slice(57:59)
+G_peak12_size = (G_peak12[3,3]-G_peak12[1,3])/1000000
+
+G_peak13 = G_Both %>% 
+  slice(61:64)
+G_peak13_size = (G_peak13[4,3]-G_peak13[1,3])/1000000
+
+G_peak14 = G_Both %>% 
+  slice(65:68)
+G_peak14_size = (G_peak14[4,3]-G_peak14[1,3])/1000000
+
+G_peak15 = G_Both %>% 
+  slice(70:72)
+G_peak15_size = (G_peak15[3,3]-G_peak15[1,3])/1000000
+
+G_peak16 = G_Both %>% 
+  slice(73:75)
+G_peak16_size = (G_peak16[3,3]-G_peak16[1,3])/1000000
+
+G_peak17 = G_Both %>% 
+  slice(76:80)
+G_peak17_size = (G_peak17[5,3]-G_peak17[1,3])/1000000
+
+G_peak18 = G_Both %>% 
+  slice(81:84)
+G_peak18_size = (G_peak18[4,3]-G_peak18[1,3])/1000000
+
+G_peak19 = G_Both %>% 
+  slice(85:92)
+G_peak19_size = (G_peak19[8,3]-G_peak19[1,3])/1000000
+
+G_peak20 = G_Both %>% 
+  slice(93:95)
+G_peak20_size = (G_peak20[3,3]-G_peak20[1,3])/1000000
+
+G_peak21 = G_Both %>% 
+  slice(96:98)
+G_peak21_size = (G_peak21[3,3]-G_peak21[1,3])/1000000
+
+G_peak22 = G_Both %>% 
+  slice(99:103)
+G_peak22_size = (G_peak22[5,3]-G_peak22[1,3])/1000000
+
+G_peak23 = G_Both %>% 
+  slice(104:105)
+G_peak23_size = (G_peak23[2,3]-G_peak23[1,3])/1000000
+
+G_peak24 = G_Both %>% 
+  slice(106:120)
+G_peak24_size = (G_peak24[15,3]-G_peak24[1,3])/1000000
+
+G_peak25 = G_Both %>% 
+  slice(121:125)
+G_peak25_size = (G_peak25[5,3]-G_peak25[1,3])/1000000
+
+G_peak26 = G_Both %>% 
+  slice(126:128)
+G_peak26_size = (G_peak26[3,3]-G_peak26[1,3])/1000000
+
+G_peak27 = G_Both %>% 
+  slice(129:134)
+G_peak27_size = (G_peak27[6,3]-G_peak27[1,3])/1000000
+
+G_peak28 = G_Both %>% 
+  slice(135:138)
+G_peak28_size = (G_peak28[4,3]-G_peak28[1,3])/1000000
+
+G_peak29 = G_Both %>% 
+  slice(139:144)
+G_peak29_size = (G_peak29[6,3]-G_peak29[1,3])/1000000
+
+G_peak30 = G_Both %>% 
+  slice(140:146)
+G_peak30_size = (G_peak30[7,3]-G_peak30[1,3])/1000000
+
+G_peak31 = G_Both %>% 
+  slice(140:146)
+G_peak31_size = (G_peak31[7,3]-G_peak31[1,3])/1000000

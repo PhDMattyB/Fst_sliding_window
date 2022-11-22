@@ -9,6 +9,7 @@
 
 library(patchwork)
 library(tidyverse)
+theme_set(theme_bw())
 
 AC04q.1_29_split = function(data){
   AC04q.1_29 = data %>% 
@@ -31,10 +32,16 @@ Mb_Conversion = function(data){
 }
 
 
-setwd('~/PhD/SNP Demographic modelling/Outliers_directory/Fst_RDA_Colocalization')
+# setwd('~/PhD/SNP Demographic modelling/Outliers_directory/Fst_RDA_Colocalization')
+setwd('~/PhD_Genomics_Chapter3/Fst_Iceland_pops/')
+
 
 # Both_outlier = read_csv('TSBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>%
-Both_outlier = read_csv('TLGBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+
+
+# Import data -------------------------------------------------------------
+
+Both_outlier = read_csv('SLGBPEL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -78,7 +85,7 @@ Both_outlier = read_csv('TLGBPL_BOTH_Colocalization_Fst_Outliers_200Kb.csv') %>%
     CHR == '39' ~ 'AC37',
     CHR == '0' ~ 'Contigs')))
 
-iso_outlier = read_csv('TLGBPL_ISO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+iso_outlier = read_csv('SLGBPEL_ISO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>%
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -122,7 +129,7 @@ iso_outlier = read_csv('TLGBPL_ISO_Colocalization_Fst_Outliers_200Kb.csv') %>%
     CHR == '39' ~ 'AC37',
     CHR == '0' ~ 'Contigs')))
 
-morpho_outlier = read_csv('TLGBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
+morpho_outlier = read_csv('SLGBPEL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv') %>% 
   filter(FST_n > 3) %>%
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -166,7 +173,7 @@ morpho_outlier = read_csv('TLGBPL_MORPHO_Colocalization_Fst_Outliers_200Kb.csv')
     CHR == '39' ~ 'AC37',
     CHR == '0' ~ 'Contigs')))
 
-normal = read_tsv('TLGBPL_Fst_neutral_200Kb_window.txt') %>%
+normal = read_csv('SLGBPEL_Fst_Neutral_200Kb_windows.19.04.2021.csv') %>%
   filter(FST_n > 3) %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -211,7 +218,7 @@ normal = read_tsv('TLGBPL_Fst_neutral_200Kb_window.txt') %>%
     CHR == '0' ~ 'Contigs')))
 
 # fst_outlier = read_tsv('SLGPEL_Fst_outliers_200Kb_window.txt') %>%
-  fst_outlier = read_tsv('TLGBPL_Fst_outliers_200Kb_window.txt') %>% 
+  fst_outlier = read_csv('SLGBPEL_Fst_200kb_outliers_19.04.2021.csv') %>% 
 filter(FST_n > 3) %>% 
   mutate(AC_CHR = as.factor(case_when(
     CHR == '1' ~ 'AC01',
@@ -270,6 +277,57 @@ iso_outlier = Mb_Conversion(data = iso_outlier)
 morpho_outlier = Mb_Conversion(data = morpho_outlier)
 normal = Mb_Conversion(normal)
 fst_outlier = Mb_Conversion(data = fst_outlier)
+
+
+# Fst distributions - sliding window edition ------------------------------
+
+TSBPL_window_plot = normal %>% 
+  ggplot(aes(x = FST_mean))+
+  geom_density(fill = '#BF1B1B',
+               alpha = 0.7)+
+geom_density(data = iso_outlier,
+             aes(x = FST_mean),
+             fill = '#58F252',
+             alpha = 0.7)+
+geom_density(data = morpho_outlier,
+              aes(x = FST_mean),
+              fill = '#274F73',
+              alpha = 0.7)+
+geom_density(data = Both_outlier,
+             aes(x = FST_mean),
+             fill = '#F28705',
+             alpha = 0.7)+
+  geom_density(data = fst_outlier,
+               aes(x = FST_mean),
+               fill = '#C57ED9',
+               alpha = 0.7)+
+labs(x = 'Mean Fst per window', 
+     y = 'Frequency', 
+     title = 'Galtabol')+
+  # scale_fill_manual(values = '#BF1B1B')+
+  theme(panel.grid = element_blank(), 
+        axis.title = element_text(size = 14), 
+        # axis.title.x = element_blank(),
+        axis.text = element_text(size = 12), 
+        axis.ticks = element_line(size = 1), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(face = 'bold', 
+                                  size = 12), 
+        legend.position = 'none')
+
+
+GSBPI_window_plot
+SLGBPEL_window_plot
+TLGBPL_window_plot
+TSBPL_window_plot
+
+
+combo = (GSBPI_window_plot + SLGBPEL_window_plot)/(TLGBPL_window_plot + TSBPL_window_plot)
+
+ggsave('Fst_distribution_sliding_window_21.04.2021.tiff', 
+       plot = combo, 
+       units = 'cm', 
+       dpi = 'retina')
 
 ##
 # Fst outlier zoom 1-5 ----------------------------------------------------
@@ -482,47 +540,266 @@ ggsave('Common_Fst_outliers_GV_26.11.2020.tiff',
 ## set the theme for all of the plots
 theme_set(theme_bw())
 
-overlap = read_tsv('TLGBPL_Fst_overlaping_regions.txt')
+# overlap = read_tsv('TLGBPL_Fst_overlaping_regions.txt')
 ## Drop windows with less than 3 SNPs
+
+
+normal$AC_CHR2 = factor(normal$AC_CHR, 
+                        levels = c('AC01', 
+                                   'AC02', 
+                                   'AC03', 
+                                   'AC04p', 
+                                   'AC04q.1', 
+                                   'AC04q.2', 
+                                   'AC05', 
+                                   'AC06', 
+                                   'AC07', 
+                                   'AC08', 
+                                   'AC09', 
+                                   'AC10', 
+                                   'AC11', 
+                                   'AC12', 
+                                   'AC13', 
+                                   'AC14', 
+                                   'AC15', 
+                                   'AC16', 
+                                   'AC17', 
+                                   'AC18', 
+                                   'AC19', 
+                                   'AC20', 
+                                   'AC21', 
+                                   'AC22', 
+                                   'AC23', 
+                                   'AC24', 
+                                   'AC25', 
+                                   'AC26', 
+                                   'AC27', 
+                                   'AC28', 
+                                   'AC29', 
+                                   'AC30', 
+                                   'AC31', 
+                                   'AC32', 
+                                   'AC33', 
+                                   'AC34', 
+                                   'AC35', 
+                                   'AC36', 
+                                   'AC37', 
+                                   'AC38', 
+                                   'AC39', 
+                                   'Contigs'))
+
+fst_outlier$AC_CHR2 = factor(fst_outlier$AC_CHR, 
+                        levels = c('AC01', 
+                                   'AC02', 
+                                   'AC03', 
+                                   'AC04p', 
+                                   'AC04q.1', 
+                                   'AC04q.2', 
+                                   'AC05', 
+                                   'AC06', 
+                                   'AC07', 
+                                   'AC08', 
+                                   'AC09', 
+                                   'AC10', 
+                                   'AC11', 
+                                   'AC12', 
+                                   'AC13', 
+                                   'AC14', 
+                                   'AC15', 
+                                   'AC16', 
+                                   'AC17', 
+                                   'AC18', 
+                                   'AC19', 
+                                   'AC20', 
+                                   'AC21', 
+                                   'AC22', 
+                                   'AC23', 
+                                   'AC24', 
+                                   'AC25', 
+                                   'AC26', 
+                                   'AC27', 
+                                   'AC28', 
+                                   'AC29', 
+                                   'AC30', 
+                                   'AC31', 
+                                   'AC32', 
+                                   'AC33', 
+                                   'AC34', 
+                                   'AC35', 
+                                   'AC36', 
+                                   'AC37', 
+                                   'AC38', 
+                                   'AC39', 
+                                   'Contigs'))
+
+iso_outlier$AC_CHR2 = factor(iso_outlier$AC_CHR, 
+                        levels = c('AC01', 
+                                   'AC02', 
+                                   'AC03', 
+                                   'AC04p', 
+                                   'AC04q.1', 
+                                   'AC04q.2', 
+                                   'AC05', 
+                                   'AC06', 
+                                   'AC07', 
+                                   'AC08', 
+                                   'AC09', 
+                                   'AC10', 
+                                   'AC11', 
+                                   'AC12', 
+                                   'AC13', 
+                                   'AC14', 
+                                   'AC15', 
+                                   'AC16', 
+                                   'AC17', 
+                                   'AC18', 
+                                   'AC19', 
+                                   'AC20', 
+                                   'AC21', 
+                                   'AC22', 
+                                   'AC23', 
+                                   'AC24', 
+                                   'AC25', 
+                                   'AC26', 
+                                   'AC27', 
+                                   'AC28', 
+                                   'AC29', 
+                                   'AC30', 
+                                   'AC31', 
+                                   'AC32', 
+                                   'AC33', 
+                                   'AC34', 
+                                   'AC35', 
+                                   'AC36', 
+                                   'AC37', 
+                                   'AC38', 
+                                   'AC39', 
+                                   'Contigs'))
+morpho_outlier$AC_CHR2 = factor(morpho_outlier$AC_CHR, 
+                        levels = c('AC01', 
+                                   'AC02', 
+                                   'AC03', 
+                                   'AC04p', 
+                                   'AC04q.1', 
+                                   'AC04q.2', 
+                                   'AC05', 
+                                   'AC06', 
+                                   'AC07', 
+                                   'AC08', 
+                                   'AC09', 
+                                   'AC10', 
+                                   'AC11', 
+                                   'AC12', 
+                                   'AC13', 
+                                   'AC14', 
+                                   'AC15', 
+                                   'AC16', 
+                                   'AC17', 
+                                   'AC18', 
+                                   'AC19', 
+                                   'AC20', 
+                                   'AC21', 
+                                   'AC22', 
+                                   'AC23', 
+                                   'AC24', 
+                                   'AC25', 
+                                   'AC26', 
+                                   'AC27', 
+                                   'AC28', 
+                                   'AC29', 
+                                   'AC30', 
+                                   'AC31', 
+                                   'AC32', 
+                                   'AC33', 
+                                   'AC34', 
+                                   'AC35', 
+                                   'AC36', 
+                                   'AC37', 
+                                   'AC38', 
+                                   'AC39', 
+                                   'Contigs'))
+Both_outlier$AC_CHR2 = factor(Both_outlier$AC_CHR, 
+                        levels = c('AC01', 
+                                   'AC02', 
+                                   'AC03', 
+                                   'AC04p', 
+                                   'AC04q.1', 
+                                   'AC04q.2', 
+                                   'AC05', 
+                                   'AC06', 
+                                   'AC07', 
+                                   'AC08', 
+                                   'AC09', 
+                                   'AC10', 
+                                   'AC11', 
+                                   'AC12', 
+                                   'AC13', 
+                                   'AC14', 
+                                   'AC15', 
+                                   'AC16', 
+                                   'AC17', 
+                                   'AC18', 
+                                   'AC19', 
+                                   'AC20', 
+                                   'AC21', 
+                                   'AC22', 
+                                   'AC23', 
+                                   'AC24', 
+                                   'AC25', 
+                                   'AC26', 
+                                   'AC27', 
+                                   'AC28', 
+                                   'AC29', 
+                                   'AC30', 
+                                   'AC31', 
+                                   'AC32', 
+                                   'AC33', 
+                                   'AC34', 
+                                   'AC35', 
+                                   'AC36', 
+                                   'AC37', 
+                                   'AC38', 
+                                   'AC39', 
+                                   'Contigs'))
 
 TLGBPL_plot_fst2 =
   ggplot(data = normal, 
                   aes(x = win_mid_mb,
              y = FST_mean, 
-             group = AC_CHR)) +
+             group = AC_CHR2)) +
   geom_point(col = '#8C8C8C', 
-             size = 2)+
+             size = 3)+
   geom_point(data = fst_outlier,
              aes(x = win_mid_mb, 
                  y = FST_mean, 
                  group = AC_CHR),
              col = '#5488E3', 
-             size = 2)+
+             size = 3)+
   geom_point(data = iso_outlier,
              aes(x = win_mid_mb, 
                  y = FST_mean, 
                  group = AC_CHR),
              col = '#2A8C39', 
-             size = 2)+
+             size = 3)+
   geom_point(data = morpho_outlier,
              aes(x = win_mid_mb, 
                  y = FST_mean, 
                  group = AC_CHR),
              col = '#DB0808', 
-             size = 2)+
+             size = 3)+
   geom_point(data = Both_outlier,
              aes(x = win_mid_mb, 
                  y = FST_mean, 
                  group = AC_CHR),
              col = '#F2CD13', 
-             size = 2)+
-  geom_point(data = overlap, 
-             aes(x = win_mid_mb, 
-                 y = FST_mean, 
-                 group =AC_CHR), 
-             col = '#3D1673',
-             size = 2)+
-    facet_grid(~ AC_CHR, 
+             size = 3)+
+  # geom_point(data = overlap, 
+  #            aes(x = win_mid_mb, 
+  #                y = FST_mean, 
+  #                group =AC_CHR), 
+  #            col = '#3D1673',
+  #            size = 2)+
+    facet_grid(.~AC_CHR2, 
              scales = 'free')+
   labs(x = 'Chromosomal position (Mb)', 
        y = 'Fst',
@@ -582,13 +859,13 @@ VBRSIL_plot_fst2 =
   #                group = AC_CHR),
   #            col = '#F25D27', 
   #            size = 2)+
-  geom_point(data = overlap, 
-             aes(x = win_mid_mb, 
-                 y = FST_mean, 
-                 group =AC_CHR), 
-             col = '#3D1673', 
-             size = 2)+
-  facet_grid(~ AC_CHR, 
+  # geom_point(data = overlap, 
+  #            aes(x = win_mid_mb, 
+  #                y = FST_mean, 
+  #                group =AC_CHR), 
+  #            col = '#3D1673', 
+  #            size = 2)+
+  facet_grid(~ AC_CHR2, 
              scales = 'free')+
   labs(x = 'Chromosomal position (Mb)', 
        y = 'Fst',
@@ -616,20 +893,26 @@ VBRSIL_plot_fst2
 # Bar graph ---------------------------------------------------------------
 
 setwd('~/Fst_sliding_window/')
-outliers = read_tsv('Polypops_colocalization_data_fig5.txt') %>% 
-  filter(value == 'Outlier') %>% 
-  group_by(population)
+# outliers = read_tsv('Polypops_colocalization_data_fig5.txt') %>% 
+#   filter(value == 'Outlier') %>% 
+#   group_by(population)
 
+outliers = read_csv('AllPops_Outlier_Colocalization_data.21.04.2021.csv') %>% 
+  group_by(Population)
 # outliers$population
 
-near_outliers = read_tsv('Polypops_colocalization_data_fig5.txt') %>% 
-  filter(value == 'Non-Outlier') %>% 
-  group_by(population)
+# near_outliers = read_tsv('Polypops_colocalization_data_fig5.txt') %>% 
+#   filter(value == 'Non-Outlier') %>% 
+#   group_by(population)
 # near_outliers$population
+near_outliers = read_csv('AllPops_Near_Outlier_data.21.04.2021.csv') %>% 
+  group_by(Population)
 
-neutral = read_tsv('Polypops_neutral_snps_data.txt') %>% 
-  group_by(population)
+# neutral = read_tsv('Polypops_neutral_snps_data.txt') %>% 
+#   group_by(population)
 
+neutral = read_csv('Allpops_neutral_snps_21.4.2021.csv') %>% 
+  group_by(Population)
 # setwd('~/Fst_sliding_window/SLGBPI/')
 # outliers = read_tsv('SLGBPI_Colocalization_data.txt') %>% 
 #   filter(value == 'Outlier')
@@ -675,31 +958,30 @@ mutate(class = as.factor(case_when(
   rowid == '2' ~ 'Outlier loci',
   rowid == '3' ~ 'Outlier loci',
   rowid == '4' ~ 'Outlier loci',
-  rowid == '5' ~ 'Outlier loci',
+  # rowid == '5' ~ 'Outlier loci',
   # rowid == '6' ~ 'Outlier loci',
+  rowid == '5' ~ 'Near outlier loci',
   rowid == '6' ~ 'Near outlier loci',
   rowid == '7' ~ 'Near outlier loci',
   rowid == '8' ~ 'Near outlier loci',
-  rowid == '9' ~ 'Near outlier loci',
-  rowid == '10' ~ 'Near outlier loci',
+  # rowid == '10' ~ 'Near outlier loci',
   # rowid == '12' ~ 'Near outlier loci',
+  rowid == '9' ~ 'Neutral loci',
+  rowid == '10' ~ 'Neutral loci',
   rowid == '11' ~ 'Neutral loci',
   rowid == '12' ~ 'Neutral loci',
-  rowid == '13' ~ 'Neutral loci',
-  rowid == '14' ~ 'Neutral loci',
-  rowid == '15' ~ 'Neutral loci',
+  # rowid == '15' ~ 'Neutral loci',
   # rowid == '18' ~ 'Neutral loci',
 
 ))) %>%
   mutate(full_morph = as.factor(case_when(
-    population == 'VBRSIL' ~ 'G: Benthic - Pelagic',
-    population == 'VBRSIL' ~ 'S: Benthic - Pelagic',
+    Population == 'GSBPI' ~ 'G: Benthic - Pelagic',
+    Population == 'SLGBPEL' ~ 'S: Benthic - Pelagic',
     # population == 'SLGBPL' ~ 'S: Benthic - Pelagic 1',
     # population == 'SLGBPI' ~ 'S: Benthic - Pelagic 2',
-    population == 'VBRSIL' ~ 'T: Benthic 1 - Pelagic',
-    population == 'VBRSIL' ~ 'T: Benthic 2 - Pelagic',
-    population == 'VBRSIL' ~ 'V: Benthic - Pelagic'))) %>%
-arrange(population)
+    Population == 'TLGBPL' ~ 'T: Benthic 1 - Pelagic',
+    Population == 'TSBPL' ~ 'T: Benthic 2 - Pelagic'))) %>%
+arrange(Population)
   # mutate(class = as.factor(case_when(
   #   rowid == '1' ~ 'Class 1',
   #   rowid == '2' ~ 'Class 2',
@@ -749,9 +1031,14 @@ bar_graph = class_data %>%
 
 bar_graph
 
-ggsave('Fig5_islands_differentiation.tiff', 
-       width = 10,
-       plot = bar_graph)
+ggsave('Fig5_islands_differentiation_21.04.2021.tiff', 
+       units = 'cm',
+       height = 10,
+       width = 20,
+       plot = bar_graph, 
+       dpi = 'retina')
+
+##
 # combo and save ----------------------------------------------------------
 
 # combo = VBRSIL_plot_fst2 + VBRSIL_bar + plot_layout(widths = c(3, 1))
@@ -787,13 +1074,22 @@ VBRSIL2 = VBRSIL_plot_fst2
 
 total_style2 = GSBPI2 / SLGBPEL2 / TLGBPL2 / TSBPL2 / VBRSIL2
 
-ggsave('ALLPOPS_Colocalization_FstOutliers_200kb_13.04.2021.tiff',
+ggsave('ALLPOPS_Colocalization_FstOutliers_200kb_21.04.2021.tiff',
        plot = total_style2, 
        width = 33,
        height = 20,
        dpi = 'retina',
        limitsize = FALSE)
 
+
+
+ggsave('Test_Fst_plot.tiff', 
+       plot = GSBPI_plot_fst2, 
+       dpi = 'retina', 
+       units = 'cm',
+       limitsize = F, 
+       width = 130, 
+       height = 20)
 ##
 # Gene_graph --------------------------------------------------------------
 theme_set(theme_bw())
@@ -1164,91 +1460,97 @@ TSBPL_fst_outlier = fst_outlier
 intersect(Gal_fst_outlier$win_mid, 
           Svin_fst_outlier$win_mid)
 
-g_df = 
-  # Gal_both_outlier %>% 
-  # Gal_morpho_outlier %>% 
-  Gal_ISO_outlier %>%
-  # Gal_fst_outlier %>%
-  distinct(
-    # AC_CHR, 
-           # win_mid, 
-           FST_mean,
-           .keep_all = TRUE) %>% 
-  select(CHR, 
-         AC_CHR,
-         win_mid, 
-         win_mid_mb)
+# g_df = 
+#   # Gal_both_outlier %>% 
+#   # Gal_morpho_outlier %>% 
+#   Gal_ISO_outlier %>%
+#   # Gal_fst_outlier %>%
+#   distinct(
+#     # AC_CHR, 
+#            # win_mid, 
+#            FST_mean,
+#            .keep_all = TRUE) %>% 
+#   select(CHR, 
+#          AC_CHR,
+#          win_mid, 
+#          win_mid_mb)
+# 
+# s_df = 
+#   # Svin_both_outlier %>% 
+#   # Svin_morpho_outlier %>% 
+#   # Svin_ISO_outlier %>%
+#   Svin_fst_outlier %>%
+#   distinct(FST_mean, 
+#            .keep_all = TRUE) %>% 
+#   filter(CHR != 0)%>% 
+#   select(CHR, 
+#          AC_CHR,
+#          win_mid, 
+#          win_mid_mb)
+# 
+# t1_df = 
+#   # TLGBPL_both_outlier %>% 
+#   # TLGBPL_morpho_outlier %>% 
+#   # TLGBPL_ISO_outlier %>%
+#   TLGBPL_fst_outlier %>%
+#   distinct(
+#     # AC_CHR, 
+#     # win_mid, 
+#     FST_mean,
+#     .keep_all = TRUE) %>% 
+#   select(CHR, 
+#          AC_CHR,
+#          win_mid, 
+#          win_mid_mb)
+# 
+# t2_df = 
+#   # TSBPL_both_outlier %>% 
+#   # TSBPL_morpho_outlier %>% 
+#   # TSBPL_ISO_outlier %>%
+#   TSBPL_fst_outlier %>%
+#   distinct(
+#     # AC_CHR, 
+#     # win_mid, 
+#     FST_mean,
+#     .keep_all = TRUE) %>% 
+#   select(CHR, 
+#          AC_CHR,
+#          win_mid, 
+#          win_mid_mb)
 
-s_df = 
-  # Svin_both_outlier %>% 
-  # Svin_morpho_outlier %>% 
-  # Svin_ISO_outlier %>%
-  Svin_fst_outlier %>%
-  distinct(FST_mean, 
-           .keep_all = TRUE) %>% 
-  filter(CHR != 0)%>% 
-  select(CHR, 
-         AC_CHR,
-         win_mid, 
-         win_mid_mb)
 
-t1_df = 
-  # TLGBPL_both_outlier %>% 
-  # TLGBPL_morpho_outlier %>% 
-  # TLGBPL_ISO_outlier %>%
-  TLGBPL_fst_outlier %>%
-  distinct(
-    # AC_CHR, 
-    # win_mid, 
-    FST_mean,
-    .keep_all = TRUE) %>% 
-  select(CHR, 
-         AC_CHR,
-         win_mid, 
-         win_mid_mb)
+inner_join(Gal_both_outlier, 
+            Svin_both_outlier)
+## Two overlaping outlier windows in common
 
-t2_df = 
-  # TSBPL_both_outlier %>% 
-  # TSBPL_morpho_outlier %>% 
-  # TSBPL_ISO_outlier %>%
-  TSBPL_fst_outlier %>%
-  distinct(
-    # AC_CHR, 
-    # win_mid, 
-    FST_mean,
-    .keep_all = TRUE) %>% 
-  select(CHR, 
-         AC_CHR,
-         win_mid, 
-         win_mid_mb)
+inner_join(Gal_both_outlier, 
+           TLGBPL_both_outlier)
+## One overlapping outlier windows in common
 
-  intersect(g_df, 
-            s_df)
+inner_join(Gal_both_outlier, 
+           TSBPL_both_outlier)
 
-  intersect(g_df, 
-            t1_df)
-  
-  intersect(g_df, 
-            t2_df)
-  
-  intersect(s_df, 
-            t1_df)
-  
-  intersect(s_df, 
-            t2_df)
-  
-  intersect(t1_df, 
-            t2_df)
-  
-test = inner_join(g_df, 
-             s_df)
-  
-test = inner_join(test, 
-                  t1_df)
+inner_join(Svin_both_outlier, 
+           TLGBPL_both_outlier)
+## Two overlapping outlier windows in common
 
-test = inner_join(test, 
-                  t2_df)
-## 4 windows that are parallel across all gst1t2
+inner_join(Svin_both_outlier, 
+           TSBPL_both_outlier)
+
+inner_join(TLGBPL_both_outlier, 
+           TSBPL_both_outlier)
+## Three overlapping outlier windows in common
+##One ISO outlier window in common
+# 
+# test = inner_join(g_df, 
+#              s_df)
+#   
+# test = inner_join(test, 
+#                   t1_df)
+# 
+# test = inner_join(test, 
+#                   t2_df)
+# ## 4 windows that are parallel across all gst1t2
 
 
 # Table 2 window calculations ---------------------------------------------
